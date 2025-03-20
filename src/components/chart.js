@@ -97,7 +97,7 @@ const y = d3
   .range([height - margin.bottom, margin.top]);
 
 // Create main container
-const chartContainer = d3.select("#chart");
+
 chartContainer.html(""); // Clear previous chart if any
 
 // Create div that holds the two SVGs

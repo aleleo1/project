@@ -1,11 +1,7 @@
 ---
-import Chart from "./Chart"
-
+import Chart2 from './Chart_2'
 ---
-<!-- <div>
-	<button onclick="window.update(orders.ascending)">Sort Ascending</button>
-	<button onclick="window.update(orders.descending)">Sort Descending</button>
-</div> -->
-<Chart client:load="solid-js"></Chart>
-<button class="btn btn-primary w-10 h-10">Prova</button>
-<script> import './chart' </script>
+
+<div class="block content-center w-[500px] h-96 overflow-hidden">
+	<Chart2 client:only="solid-js"></Chart2>
+</div>
