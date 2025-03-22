@@ -1,17 +1,22 @@
-import { createEffect, createSignal, Show , For} from "solid-js";
+import { createEffect, createSignal, Show , For, type Signal, type Accessor, type Setter, useContext} from "solid-js";
 import * as d3 from 'd3';
+import { createStore } from "solid-js/store";
+import { useAttention } from "./context";
 interface DataPoint {
   date: Date;
   close: number;
   index?: number;
+  path?: string;
 }
+
 
 export default function Chart_2() {
   // Sample data (replace with your actual data)
   let chartContainer: SVGSVGElement | undefined;
   let container;
+  const da = useAttention()!.signals['dataAttention']
 
-  const [dataS, setData] = createSignal(
+  const [dataS, setData] = createStore<DataPoint[]>(
     [
     { date: new Date("2020-01-01"), close: 150 },
     { date: new Date("2020-02-01"), close: 170 },
@@ -81,50 +86,24 @@ export default function Chart_2() {
     { date: new Date("2025-12-01"), close: 880 },
     { date: new Date("2026-10-01"), close: 840 },
     { date: new Date("2026-11-01"), close: 870 }
-  ], {equals: (newVal, oldVal) => newVal.length === oldVal.length});
-
+  ]);
+  
   // Chart dimensions
   const margin = { top: 30, right: 50, bottom: 100, left: 80 };
-  const width = () => dataS().length * 50;
+  const width = () => dataS.length * 50;
   const height = 350 - margin.top - margin.bottom;
-
-  const [itemClicked, setItemCkd] = createSignal<boolean>(false)
-  const dataAttention = createSignal<DataPoint | undefined>(undefined)
-
 
   //ASSE X
   const xScale = () => d3.scaleUtc()
     .range([18, width()]);
-  const x = () => xScale().domain(d3.extent(dataS(), (d: DataPoint) => d.date!))
+  const x = () => xScale().domain(d3.extent(dataS, (d: DataPoint) => d.date!))
 
   //ASSE Y
   const yScale = d3.scaleLinear()
   .nice()
   .range([height, 0]); // Properly inverted range for SVG coordinates
-  const y = () => yScale.domain([0, d3.max(dataS(), d => d.close!)! * 1.1])
-  
-  const getToolTip = () => (
-    <g class="tooltip" style="pointer-events: none;">
-      <rect 
-        x={`${x()(dataAttention[0]()!.date)}`} 
-        y={`${y()(dataAttention[0]()!.close) - 30}`}  
-        width="120" 
-        height="30" 
-        rx="4" 
-        fill="rgba(0,0,0,0.8)">
-      </rect>
-      <text 
-        x={`${x()(dataAttention[0]()!.date) + 5}`}  
-        y={`${y()(dataAttention[0]()!.close) - 15}`}  
-        font-size="12px" 
-        fill="white"
-        text-anchor="start"
-        alignment-baseline="middle">
-        {formatDate(dataAttention[0]()!.date)}
-      </text>
-</g>
+  const y = () => yScale.domain([0, d3.max(dataS, d => d.close!)! * 1.1])
 
-  )   
 
   function loadNewData(event: any) {
     const el = event.target
@@ -134,14 +113,14 @@ export default function Chart_2() {
         for(let i = 0; i < 5; i++){
         
         
-          const lastDate = new Date(dataS().at(0)!.date);
+          const lastDate = new Date(dataS.at(0)!.date);
           // Add one month to the last date
           const newDate = new Date(lastDate);
           newDate.setMonth(newDate.getMonth() - 1);
           
           const d = {
             date: newDate, 
-            close: dataS().at(0)!.close + (Math.random() * 30 - 15) // Add some variation
+            close: dataS.at(0)!.close + (Math.random() * 30 - 15) // Add some variation
           };
           
           setData((current) => [d, ...current]); // Add to the end, not beginning
@@ -154,10 +133,9 @@ export default function Chart_2() {
   
   // Make sure your scales update when data changes
   createEffect(() => {
-    // This will re-run whenever dataS() changes
-    const data = dataS();
-    x().domain(d3.extent(data, d => d.date));
-    y().domain([0, d3.max(data, d => d.close!)! * 1.1]);
+    // This will re-run whenever dataS changes
+    x().domain(d3.extent(dataS, d => d.date));
+    y().domain([0, d3.max(dataS, d => d.close!)! * 1.1]);
   });
  
   
@@ -169,7 +147,7 @@ export default function Chart_2() {
             <g transform={`translate(0,${height})`} fill="none" font-size="10" font-family="sans-serif"
               text-anchor="middle">
               <path class="domain" stroke="currentColor" d={`M0,6V0H${width()}V6`}></path>
-              <For each={dataS()}>{(item, index) => (
+              <For each={dataS}>{(item, index) => (
                 <g class="tick" opacity="1" transform={`translate(${x()(item.date) - 36},35)`}>
                   <line stroke="currentColor" transform={`translate(36,-36)`} y2="6"></line>
                   <text fill="currentColor" y="9" dy=".15em"  dx="-.8em"
@@ -206,7 +184,7 @@ export default function Chart_2() {
             </g>
             
             {/* Data lines */}
-            <For each={dataS()}>{(item, index) => (
+            <For each={dataS}>{(item, index) => (
               <line
                 class="data-line"
                 x1={x()(item.date)}
@@ -219,22 +197,39 @@ export default function Chart_2() {
             )}</For>
 
             {/* Data Points */}
-            <For each={dataS()}>{(item, index) => (
-             <circle class="data-point" 
+            <For each={dataS}>{(item, index) => (
+             <circle class="data-point cursor-pointer" 
              cx={x()(item.date)} 
              cy={y()(item.close)} 
-             fill={dataAttention[0]() && dataAttention[0]()!.index === index() ? 'orange' : 'steelblue' }
-             r={dataAttention[0]() && dataAttention[0]()!.index === index() ? '7' : '4' }
-             onClick={() => setItemCkd(true)}
-             onMouseOver={() => (dataAttention[1]({...item, ...{index: index()}}))}
-             onMouseOut={() => (dataAttention[1](undefined))}
+             fill={da[0]() && da[0]()!.index === index() ? 'orange' : 'steelblue' }
+             r={da[0]() && da[0]()!.index === index() ? '7' : '4' }
+             onMouseOver={() => (da[1]({...item, index: index()}))}
+             onMouseOut={() => (da[1](undefined))}
               ></circle>
             )}</For>
           </g>
 
             {/* ToolTip */}
-          <Show when={dataAttention[0]()}>
-            {getToolTip()}
+          <Show when={da[0]()}>
+            <g class="tooltip" style="pointer-events: none;">
+                  <rect 
+                    x={`${x()(da[0]()!.date)}`} 
+                    y={`${y()(da[0]()!.close) - 30}`}  
+                    width="120" 
+                    height="30" 
+                    rx="4" 
+                    fill="rgba(0,0,0,0.8)">
+                  </rect>
+                  <text 
+                    x={`${x()(da[0]()!.date) + 5}`}  
+                    y={`${y()(da[0]()!.close) - 15}`}  
+                    font-size="12px" 
+                    fill="white"
+                    text-anchor="start"
+                    alignment-baseline="middle">
+                    {formatDate(da[0]()!.date)}
+                  </text>
+            </g>
           </Show>
         </svg>
         
