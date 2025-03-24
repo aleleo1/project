@@ -1,61 +1,49 @@
-import { createEffect, createSignal, Show , For, type Signal, type Accessor, type Setter, useContext, type Resource} from "solid-js";
-import * as d3 from 'd3';
-import { createStore } from "solid-js/store";
+import { createEffect, Show , For} from "solid-js";
+import {extent, scaleUtc, max, scaleLinear } from 'd3';
 import { useData } from "./context";
-interface DataPoint {
-  date: Date;
-  close: number;
-  index?: number;
-  path?: string;
-}
+import type { DataPoint } from "../interfaces";
 
 
-export default function Chart_2(p: any) {
+export default function Chart_2() {
   // Sample data (replace with your actual data)
   let chartContainer: SVGSVGElement | undefined;
   let container;
   const da = useData()!.signals['dataAttention']
   const [dataS, {mutate}] = useData()!.data['data']
-  /* const [dataS, setData] = createStore<DataPoint[]>(
-  data[0]()!
-  ); */
-  
-  // Chart dimensions
+
   const margin = { top: 30, right: 50, bottom: 100, left: 80 };
   const width = () => dataS()!.length * 50;
   const height = 350 - margin.top - margin.bottom;
 
   //ASSE X
-  const xScale = () => d3.scaleUtc()
+  const xScale = () => scaleUtc()
     .range([18, width()]);
-  const x = () => xScale().domain(d3.extent(dataS()!, (d: DataPoint) => d.date!) as Date[])
+  const x = () => xScale().domain(extent(dataS()!, (d: DataPoint) => d.date!) as Date[])
 
   //ASSE Y
-  const yScale = d3.scaleLinear()
+  const yScale = scaleLinear()
   .nice()
   .range([height, 0]); // Properly inverted range for SVG coordinates
-  const y = () => yScale.domain([0, d3.max(dataS()!, d => d.close!)! * 1.1])
+  const y = () => yScale.domain([0, max(dataS()!, d => d.close!)! * 1.1])
 
 
   function loadNewData(event: any) {
     const el = event.target
 
     if (el.scrollLeft <= 0) {
-        // User scrolled too far left, reset to right
         for(let i = 0; i < 5; i++){
         
         
           const lastDate = new Date(dataS()!.at(0)!.date);
-          // Add one month to the last date
           const newDate = new Date(lastDate);
           newDate.setMonth(newDate.getMonth() - 1);
           
           const d = {
             date: newDate, 
-            close: dataS()!.at(0)!.close + (Math.random() * 30 - 15) // Add some variation
+            close: dataS()!.at(0)!.close + (Math.random() * 30 - 15)
           };
           
-          mutate((current) => [d, ...current!]); // Add to the end, not beginning
+          mutate((current) => [d, ...current!]);
         }
         el.scrollLeft  = 20;
     }
@@ -63,11 +51,9 @@ export default function Chart_2(p: any) {
   const formatDate = (d: Date) => (d.toISOString().replace('T', ' ').slice(0, 19)) 
 
   
-  // Make sure your scales update when data changes
   createEffect(() => {
-    // This will re-run whenever dataS changes
-    x().domain(d3.extent(dataS()!, d => d.date) as Date[]);
-    y().domain([0, d3.max(dataS()!, d => d.close!)! * 1.1]);
+    x().domain(extent(dataS()!, d => d.date) as Date[]);
+    y().domain([0, max(dataS()!, d => d.close!)! * 1.1]);
   });
  
   

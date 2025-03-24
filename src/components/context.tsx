@@ -1,10 +1,11 @@
 import { createContext, createResource, createSignal, useContext, type Accessor, type ResourceReturn, type Setter, type Signal } from "solid-js";
-import type { DataPoint } from "./interfaces";
+import type { DataPoint } from "../interfaces";
+import { delay } from "../utils";
  const AttentionContext = createContext<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[], unknown> }}>();
 
 export function DataProvider(props: any) {
 const dataAttention = createSignal<DataPoint | undefined>(undefined)
-const data = createResource<DataPoint[]>( async () =>  {/* await delay(1000); */ return [
+const data = createResource<DataPoint[]>( async () =>  {await delay(1000); return [
     { date: new Date("2020-01-01"), close: 150 },
     { date: new Date("2020-02-01"), close: 170 },
     { date: new Date("2020-03-01"), close: 160 },

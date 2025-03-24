@@ -1,6 +1,5 @@
-import { createContext, createEffect, createResource, createSignal, onMount, Show, type Setter } from "solid-js";
+import { onMount, Show } from "solid-js";
 import Chart_2 from "./Chart_2";
-import type { DataPoint } from './interfaces'
 import { DataProvider, useData } from "./context";
 const delay = (ms: any) => new Promise(res => setTimeout(res, ms));
 
