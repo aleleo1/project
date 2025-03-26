@@ -1,11 +1,24 @@
-import { createContext, createResource, createSignal, useContext, type Accessor, type ResourceReturn, type Setter, type Signal } from "solid-js";
+import { createContext, createEffect, createResource, createSignal, useContext, type Accessor, type ResourceReturn, type Setter, type Signal } from "solid-js";
 import type { DataPoint } from "../interfaces";
 import { delay } from "../utils";
+import { createStore, unwrap, reconcile } from "solid-js/store";
  const AttentionContext = createContext<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[], unknown> }}>();
 
 export function DataProvider(props: any) {
+const [refetch, setRefetch] = createSignal(true); // Initial fetch
+async function fetchData() {
+    if (!refetch()) return; // Don't fetch if the trigger is false
+    const response = await fetch('/api/data');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return await response.json();
+}
+
+const data = createResource<DataPoint[], boolean>(refetch, fetchData)
+
 const dataAttention = createSignal<DataPoint | undefined>(undefined)
-const data = createResource<DataPoint[]>( async () =>  {await delay(1000); return [
+/* const data = createResource<DataPoint[]>( async () =>  {await delay(1000); return [
     { date: new Date("2020-01-01"), close: 150 },
     { date: new Date("2020-02-01"), close: 170 },
     { date: new Date("2020-03-01"), close: 160 },
@@ -74,7 +87,7 @@ const data = createResource<DataPoint[]>( async () =>  {await delay(1000); retur
     { date: new Date("2025-12-01"), close: 880 },
     { date: new Date("2026-10-01"), close: 840 },
     { date: new Date("2026-11-01"), close: 870 }
-  ] })
+  ] }) */
 const provider = {signals: {dataAttention}, data: {data}}
 
     return (

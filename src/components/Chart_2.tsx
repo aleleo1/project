@@ -11,27 +11,25 @@ export default function Chart_2() {
   const da = useData()!.signals['dataAttention']
   const [dataS, {mutate}] = useData()!.data['data']
 
-  const margin = { top: 30, right: 50, bottom: 100, left: 80 };
+  const margin = { top: 30, right: 50, bottom: 100, left: 100 };
   const width = () => dataS()!.length * 50;
   const height = 350 - margin.top - margin.bottom;
 
   //ASSE X
-  const xScale = () => scaleUtc()
-    .range([18, width()]);
-  const x = () => xScale().domain(extent(dataS()!, (d: DataPoint) => d.date!) as Date[])
+  const x = () => scaleUtc([new Date(dataS()![0].date), new Date(dataS()!.at(-1)!.date)], [0, width()])
+  //const x = () => xScale().domain(extent(dataS()!, (d: DataPoint) => new Date(d.date)) as Date[])
 
   //ASSE Y
   const yScale = scaleLinear()
   .nice()
   .range([height, 0]); // Properly inverted range for SVG coordinates
-  const y = () => yScale.domain([0, max(dataS()!, d => d.close!)! * 1.1])
-
+  const y = () => yScale.domain([0, max(dataS()!, d => d.close)!])
 
   function loadNewData(event: any) {
     const el = event.target
 
     if (el.scrollLeft <= 0) {
-        for(let i = 0; i < 5; i++){
+        /* for(let i = 0; i < 5; i++){
         
         
           const lastDate = new Date(dataS()!.at(0)!.date);
@@ -44,16 +42,16 @@ export default function Chart_2() {
           };
           
           mutate((current) => [d, ...current!]);
-        }
+        } */
         el.scrollLeft  = 20;
     }
   }
-  const formatDate = (d: Date) => (d.toISOString().replace('T', ' ').slice(0, 19)) 
-
+  const formatDate = (d: Date) => ((typeof d === 'string' ? d : d.toISOString()).replace('T', ' ').slice(0, 19)) 
   
   createEffect(() => {
-    x().domain(extent(dataS()!, d => d.date) as Date[]);
-    y().domain([0, max(dataS()!, d => d.close!)! * 1.1]);
+/*     x().domain(extent(dataS()!, d => d.date) as Date[]);
+    y().domain([0, max(dataS()!, d => d.close!)! * 1.1]); */
+    console.log(x().domain())
   });
  
   
@@ -66,10 +64,9 @@ export default function Chart_2() {
               text-anchor="middle">
               <path class="domain" stroke="currentColor" d={`M0,6V0H${width()}V6`}></path>
               <For each={dataS()}>{(item, index) => (
-                <g class="tick" opacity="1" transform={`translate(${x()(item.date) - 36},35)`}>
-                  <line stroke="currentColor" transform={`translate(36,-36)`} y2="6"></line>
-                  <text fill="currentColor" y="9" dy=".15em"  dx="-.8em"
-                    transform="rotate(-45)">{formatDate(item.date)}</text>
+                <g class="tick" opacity="1" transform={`translate(${x()(new Date(item.date))},35)`}>
+                  <line stroke="currentColor" transform={`translate(0,-36)`} y2="6"></line>
+                  <text fill="currentColor" transform="rotate(-45), translate(-36, -18)">{formatDate(item.date)}</text>
                 </g>
               )}</For>
             </g>
@@ -105,9 +102,9 @@ export default function Chart_2() {
             <For each={dataS()}>{(item, index) => (
               <line
                 class="data-line"
-                x1={x()(item.date)}
+                x1={x()(new Date(item.date))}
                 y1={height}
-                x2={x()(item.date)}
+                x2={x()(new Date(item.date))}
                 y2={y()(item.close)}
                 stroke="steelblue"
                 stroke-width="1"
@@ -117,7 +114,7 @@ export default function Chart_2() {
             {/* Data Points */}
             <For each={dataS()}>{(item, index) => (
              <circle class="data-point cursor-pointer" 
-             cx={x()(item.date)} 
+             cx={x()(new Date(item.date))} 
              cy={y()(item.close)} 
              fill={da[0]() && da[0]()!.index === index() ? 'orange' : 'steelblue' }
              r={da[0]() && da[0]()!.index === index() ? '7' : '4' }

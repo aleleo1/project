@@ -6,7 +6,7 @@ const delay = (ms: any) => new Promise(res => setTimeout(res, ms));
 function ChartContainer () {
     const da = useData()!.signals['dataAttention']
     const data = useData()!.data['data']
-    onMount(async () => {await delay(10000); data[1].mutate(
+   /*  onMount(async () => {await delay(10000); data[1].mutate(
       [
       
         { date: new Date("2021-08-01"), close: 360 },
@@ -42,7 +42,7 @@ function ChartContainer () {
         { date: new Date("2026-10-01"), close: 840 },
         { date: new Date("2026-11-01"), close: 870 }
       ]
-    );console.log('muted!');} )
+    );console.log('muted!');} ) */
    return (
        <div class="flex flex-row gap-28 items-center justify-center w-full overflow-hidden">
         <p class="w-10">{da[0]() ? da[0]()!.date.toString() : ''}</p>

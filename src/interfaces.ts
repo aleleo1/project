@@ -4,3 +4,13 @@ export interface DataPoint {
     index?: number;
     path?: string;
   }
+
+
+ export interface MySQLAdapterConfig {
+      host?: string;
+      user?: string;
+      password?: string;
+      database?: string;
+      port?: number;
+      connectionLimit?: number;
+  }

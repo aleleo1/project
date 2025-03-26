@@ -1,19 +1,14 @@
-// @ts-check
+// astro.config.mts
 import { defineConfig } from 'astro/config';
-
 import tailwindcss from '@tailwindcss/vite';
-
-
-
 import solidJs from '@astrojs/solid-js';
-
-
-
-// https://astro.build/config
+import createMySQLAdapter from './src/db/mysql-adapter';
 export default defineConfig({
   vite: {
     plugins: [tailwindcss()]
   },
-
-  integrations: [solidJs()]
+  integrations: [
+    solidJs(),
+    createMySQLAdapter()
+  ],
 });
