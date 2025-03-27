@@ -2,6 +2,7 @@ import { createEffect, Show , For} from "solid-js";
 import {scaleUtc, max, scaleLinear, utcDay, utcMillisecond, utcHour, utcMinute, utcMonth } from 'd3';
 import { useData } from "./context";
 import { formatDate } from "../utils";
+import { navigate } from "astro:transitions/client";
 
 
 export default function Chart_2() {
@@ -31,10 +32,11 @@ export default function Chart_2() {
     const el = event.target;
     const scrollWidth = el.scrollWidth;
     const clientWidth = el.clientWidth;
-    
+   
     if (el.scrollLeft + clientWidth >= scrollWidth) {
       el.scrollLeft = scrollWidth - clientWidth - 20;
     }
+    
   }
   
   createEffect(() => {
@@ -79,7 +81,7 @@ export default function Chart_2() {
               <For each={y().ticks(10)}>{(tick) => (
                 <line 
                   x1="0" 
-                  x2={width} 
+                  x2={xWidth() + margin.left + margin.right} 
                   y1={y()(tick)} 
                   y2={y()(tick)} 
                   stroke="#e0e0e0" 
