@@ -5,17 +5,17 @@ import { createStore, unwrap, reconcile } from "solid-js/store";
  const AttentionContext = createContext<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[], unknown> }}>();
 
 export function DataProvider(props: any) {
-const [refetch, setRefetch] = createSignal(true); // Initial fetch
+const [refetch, setRefetch] = createSignal('q1'); // Initial fetch
 async function fetchData() {
-    if (!refetch()) return; // Don't fetch if the trigger is false
-    const response = await fetch('/api/data');
+    const response = await fetch('/api/data?query=' + refetch());
+    console.log('/api/data?query=' + refetch())
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     return await response.json();
 }
 
-const data = createResource<DataPoint[], boolean>(refetch, fetchData)
+const data = createResource<DataPoint[], string>(refetch, fetchData)
 
 const dataAttention = createSignal<DataPoint | undefined>(undefined)
 /* const data = createResource<DataPoint[]>( async () =>  {await delay(1000); return [

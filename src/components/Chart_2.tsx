@@ -1,7 +1,7 @@
 import { createEffect, Show , For} from "solid-js";
-import {extent, scaleUtc, max, scaleLinear } from 'd3';
+import {scaleUtc, max, scaleLinear, utcDay, utcMillisecond, utcHour, utcMinute, utcMonth } from 'd3';
 import { useData } from "./context";
-import type { DataPoint } from "../interfaces";
+import { formatDate } from "../utils";
 
 
 export default function Chart_2() {
@@ -11,12 +11,14 @@ export default function Chart_2() {
   const da = useData()!.signals['dataAttention']
   const [dataS, {mutate}] = useData()!.data['data']
 
-  const margin = { top: 30, right: 50, bottom: 100, left: 100 };
-  const width = () => dataS()!.length * 50;
+  const margin = { top: 30, right: 50, bottom: 120, left: 100 };
+  const width = 350
   const height = 350 - margin.top - margin.bottom;
 
   //ASSE X
-  const x = () => scaleUtc([new Date(dataS()![0].date), new Date(dataS()!.at(-1)!.date)], [0, width()])
+  const xWidth = () => (utcMonth.count( new Date(dataS()!.at(-1)!.date), new Date(dataS()!.at(0)!.date)) + 1) * 100
+  const range = () => [0, xWidth()]
+  const x = () => scaleUtc([new Date(dataS()![0].date), new Date(dataS()!.at(-1)!.date)], range())
   //const x = () => xScale().domain(extent(dataS()!, (d: DataPoint) => new Date(d.date)) as Date[])
 
   //ASSE Y
@@ -26,51 +28,39 @@ export default function Chart_2() {
   const y = () => yScale.domain([0, max(dataS()!, d => d.close)!])
 
   function loadNewData(event: any) {
-    const el = event.target
-
-    if (el.scrollLeft <= 0) {
-        /* for(let i = 0; i < 5; i++){
-        
-        
-          const lastDate = new Date(dataS()!.at(0)!.date);
-          const newDate = new Date(lastDate);
-          newDate.setMonth(newDate.getMonth() - 1);
-          
-          const d = {
-            date: newDate, 
-            close: dataS()!.at(0)!.close + (Math.random() * 30 - 15)
-          };
-          
-          mutate((current) => [d, ...current!]);
-        } */
-        el.scrollLeft  = 20;
+    const el = event.target;
+    const scrollWidth = el.scrollWidth;
+    const clientWidth = el.clientWidth;
+    
+    if (el.scrollLeft + clientWidth >= scrollWidth) {
+      el.scrollLeft = scrollWidth - clientWidth - 20;
     }
   }
-  const formatDate = (d: Date) => ((typeof d === 'string' ? d : d.toISOString()).replace('T', ' ').slice(0, 19)) 
   
   createEffect(() => {
 /*     x().domain(extent(dataS()!, d => d.date) as Date[]);
     y().domain([0, max(dataS()!, d => d.close!)! * 1.1]); */
-    console.log(x().domain())
+    console.log(x().domain(), width)
   });
  
   
   return (
       <div ref={container} style={{ width: '500px', height: '350px', 'overflow-x': 'auto',"overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px'}} onscroll={loadNewData}>
-        <svg ref={chartContainer} style={{ display: 'block' }} width={width() + margin.left + margin.right} height="350" viewBox={`0 0 ${width() + margin.left + margin.right} 350`}>
+        <svg ref={chartContainer} style={{ display: 'block' }} width={xWidth() + margin.left + margin.right} height="350" viewBox={`0 0 ${xWidth() + margin.left + margin.right} 350`}>
           <g transform={`translate(${margin.left},${margin.top})`}>
             {/* X-axis */}
             <g transform={`translate(0,${height})`} fill="none" font-size="10" font-family="sans-serif"
               text-anchor="middle">
-              <path class="domain" stroke="currentColor" d={`M0,6V0H${width()}V6`}></path>
-              <For each={dataS()}>{(item, index) => (
-                <g class="tick" opacity="1" transform={`translate(${x()(new Date(item.date))},35)`}>
-                  <line stroke="currentColor" transform={`translate(0,-36)`} y2="6"></line>
-                  <text fill="currentColor" transform="rotate(-45), translate(-36, -18)">{formatDate(item.date)}</text>
+              <path class="domain" stroke="currentColor" d={`M0,6V0H${xWidth() + margin.left + margin.right}V6`}></path>
+              <For each={x().ticks(utcMonth.every(1)!)}>{(item, index) => (
+                <g class="tick" opacity="1" transform={`translate(${x()(new Date(item))},35)`}>
+                  <line stroke="currentColor" transform={`translate(0,-36)`} y2="12"></line>
+                  <line stroke="currentColor" transform={`translate(0,-24) rotate(45)`} y2="12"></line>
+                  <text fill="currentColor"  transform="rotate(-45), translate(-25, -15)">{formatDate(item)}</text>
                 </g>
               )}</For>
             </g>
-            {/* <text x={width() / 2} y={height + 60} style={{ 'text-anchor': 'middle' }}>Date</text> */}
+            {/* <text x={width / 2} y={height + 60} style={{ 'text-anchor': 'middle' }}>Date</text> */}
             
             {/* Y-axis */}
             <g fill="none" font-size="10" font-family="sans-serif" text-anchor="end">
@@ -82,14 +72,14 @@ export default function Chart_2() {
                 </g>
               )}</For>
             </g>
-            {/* <text transform="rotate(-90)" y="-35" x={-height / 2} dy="1em" style={{ 'text-anchor': 'middle' }}>Price ($)</text> */}
+            <text transform="rotate(-90)" y="-75" x="-100" dy="1em" style={{ 'text-anchor': 'middle' }}>VRP</text>
             
             {/* Grid lines */}
             <g class="grid">
               <For each={y().ticks(10)}>{(tick) => (
                 <line 
                   x1="0" 
-                  x2={width()} 
+                  x2={width} 
                   y1={y()(tick)} 
                   y2={y()(tick)} 
                   stroke="#e0e0e0" 
@@ -128,21 +118,27 @@ export default function Chart_2() {
           <Show when={da[0]()}>
             <g class="tooltip" style="pointer-events: none;">
                   <rect 
-                    x={`${x()(da[0]()!.date)}`} 
+                    x={`${x()(new Date(da[0]()!.date))}`} 
                     y={`${y()(da[0]()!.close) - 30}`}  
                     width="120" 
-                    height="30" 
+                    height="50" 
                     rx="4" 
                     fill="rgba(0,0,0,0.8)">
                   </rect>
                   <text 
-                    x={`${x()(da[0]()!.date) + 5}`}  
-                    y={`${y()(da[0]()!.close) - 15}`}  
+                    x={`${x()(new Date(da[0]()!.date)) + 50}`}  
+                    y={`${y()(da[0]()!.close) - 15 }`}  
                     font-size="12px" 
                     fill="white"
                     text-anchor="start"
-                    alignment-baseline="middle">
-                    {formatDate(da[0]()!.date)}
+                    alignment-baseline="middle"
+                    >
+                      <tspan x={x()(new Date(da[0]()!.date)) + 5} dy="0">
+                    {formatDate(da[0]()!.date)} 
+                    </tspan>
+                    <tspan x={x()(new Date(da[0]()!.date)) + 5} dy="20">
+                    {da[0]()!.close ? parseInt(da[0]()!.close) : 0}
+                    </tspan>
                   </text>
             </g>
           </Show>
