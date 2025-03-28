@@ -23,13 +23,9 @@ async function fetchData() {
         if (d.length < 300) {
             refetch[3](false)
         }
-        console.log(d, refetch[2]())
-        if (refetch[2]()){
-            console.log('mutating')
         data[1].mutate((prev)  => [...prev, ...d]);
-        }
     }
-    console.log(data[0]().length)
+    console.log(`new len > 300 ? ${data[0]().length > 300}`)
     //return props.data
 }
 

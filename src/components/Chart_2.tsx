@@ -43,7 +43,7 @@ export default function Chart_2() {
       setRefetch([q, d])
       // Validate state object
       if(Boolean(recall()).valueOf()){
-      history.pushState({}, '', refetch())
+        history.pushState({}, '', refetch())
       }
       el.scrollLeft = scrollWidth - clientWidth - 20;
     }
