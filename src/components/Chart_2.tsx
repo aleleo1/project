@@ -1,34 +1,32 @@
 import { createEffect, Show , For, onMount} from "solid-js";
 import {scaleUtc, max, scaleLinear, utcMonth } from 'd3';
-import { useData } from "./context";
+import { useData } from "./dataContext";
 import { formatDate, getParams } from "../utils";
 import DOMPurify from 'isomorphic-dompurify';
+import { useAttention } from "./attentionContext";
 
 export default function Chart_2() {
   // Sample data (replace with your actual data)
   let chartContainer: SVGSVGElement | undefined;
   let container;
-  const da = useData()!.signals['dataAttention']
+  const da = useAttention()!.signals['dataAttention']
   const [refetch, setRefetch, recall] = useData()!.signals['refetch']
   const [dataS] = useData()!.data['data']
-
   const margin = { top: 30, right: 50, bottom: 120, left: 100 };
   const width = 350
   const height = 350 - margin.top - margin.bottom;
 
       
-  onMount(() => history.pushState({}, '', refetch()))
 
   //ASSE X
   const xWidth = () => (utcMonth.count( new Date(dataS()!.at(-1)!.date), new Date(dataS()!.at(0)!.date)) + 1) * 100
   const range = () => [0, xWidth()]
   const x = () => scaleUtc([new Date(dataS()![0].date), new Date(dataS()!.at(-1)!.date)], range())
-  //const x = () => xScale().domain(extent(dataS()!, (d: DataPoint) => new Date(d.date)) as Date[])
 
   //ASSE Y
   const yScale = scaleLinear()
   .nice()
-  .range([height, 0]); // Properly inverted range for SVG coordinates
+  .range([height, 0]);
   const y = () => yScale.domain([0, max(dataS()!, d => d.close)!])
 
   function loadNewData(event: any) {
@@ -40,25 +38,16 @@ export default function Chart_2() {
       const url = new URL(window.location.href)
       const q = url.searchParams.get('q')
       let d = new Date(url.searchParams.get('data')!)
-      if (dataS()!.length === 300 && d.toLocaleDateString() !== new Date().toLocaleDateString() ) {
-        d = new Date()
-        
-      } 
       setRefetch([q, d])
-      if(Boolean(recall()).valueOf() && new Date(getParams(refetch())[1]).toLocaleDateString() !== d.toLocaleDateString()){
-        history.pushState({}, '', refetch())
+      if(Boolean(recall()).valueOf()){
+        history.pushState([], '', refetch())
       }
+     console.log('scroll effect', refetch(), )
       
       el.scrollLeft = scrollWidth - clientWidth - 20;
     }
     
   }
-  
-  createEffect(() => {
-/*     x().domain(extent(dataS()!, d => d.date) as Date[]);
-    y().domain([0, max(dataS()!, d => d.close!)! * 1.1]); */
-/*     console.log(x().domain(), width) */
-  });
  
   
   return (

@@ -6,8 +6,9 @@ export const GET: APIRoute = async (req) => {
     const params = req.url.searchParams
     const date = new Date(params.get('data')!)
     const q = params.get('q')!
-    console.log(params)
-    const result = (await query(date, q!))
+    const rif = new Date(params.get('rif')!)
+    
+    const result = (await query(date, q!, rif))
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: {

@@ -2,11 +2,18 @@
 import { query } from '../db/mysql-adapter'
 import Container from './Container'
 const params = new URL(Astro.request.url).searchParams
-const date = params.get('data')! ? new Date(params.get('data')!) : new Date()
 const q = params.get('q')! ?? 'q1'
-const result = (await query(date, q!))
-console.log(`loaded len ${result.length} with last date ${result.at(-1).date}`)
+const rif = params.get('rif')! ? new Date(params.get('rif')!) : new Date()
+let date = new Date()
+
+if (params.get('data')){
+	date = new Date(params.get('data')!)
+}
+else {
+	date.setMonth(date.getMonth() - 6)
+}
+
+const result = (await query(date, q!, rif))
 ---
 
-	<Container data={result} client:only="solid-js"></Container>
-	<Container data={result} client:only="solid-js"></Container>
+	<Container data={result} initialState={[q, date, rif]} client:only="solid-js"></Container>

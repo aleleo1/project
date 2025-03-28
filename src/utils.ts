@@ -1,11 +1,13 @@
 import { type Accessor, type Setter, type Signal, createSignal } from "solid-js";
-
+const DEFAULT_RIF = new Date()
 export const delay = (ms: any) => new Promise(res => setTimeout(res, ms));
 export  const formatDate = (d: Date) => ((typeof d === 'string' ? d : d.toISOString()).replace('T', ' ').slice(0, 10)) 
 
+export const dateMinus6 = (d: Date) => {d.setMonth(d.getMonth() - 6); return d;}
+
 // Custom signal creator function
-export function createQuerySignal(val: [string, Date]) {
-    const [getValue, setValue] = createSignal<string>(`?q=${val[0]}&data=${formatDate((val[1]))}`);
+export function createQuerySignal(val: [string, Date, Date]) {
+    const [getValue, setValue] = createSignal<string>(`?q=${val[0]}&data=${formatDate((val[1]))}&rif=${formatDate(val[2])}`);
     const [callable, setCallable] = createSignal<boolean>(true)
     // Custom getter that returns formatted string
     const querySignal = [
@@ -14,14 +16,13 @@ export function createQuerySignal(val: [string, Date]) {
       },
       
         // Custom setter that takes an array of strings
-        (input: [string, Date]) => {
-          const [q, dateInput] = input;
-          const dateMinus6 = dateInput ?? new Date()
-          dateMinus6.setMonth(dateMinus6.getMonth() - 6)
+        (input: [string, Date, Date?]) => {
+          const [q, dateInput, rif] = input;
           const formattedDate = formatDate(
-            dateMinus6
+            dateMinus6(dateInput ?? new Date())
           );
-          setValue(`?q=${q}&data=${formattedDate}`);
+          const formattedRif = formatDate(rif ?? DEFAULT_RIF)
+          setValue(`?q=${q}&data=${formattedDate}&rif=${formattedRif}`);
         },
         () => {return callable()},
         (input: boolean) => setCallable(input)
