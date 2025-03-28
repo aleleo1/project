@@ -23,8 +23,8 @@ export function createQuerySignal(val: [string, Date]) {
           );
           setValue(`?q=${q}&data=${formattedDate}`);
         },
-        callable,
-        setCallable
+        () => {return callable()},
+        (input: boolean) => setCallable(input)
       
     ];
   

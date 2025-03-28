@@ -25,7 +25,7 @@ async function fetchData() {
         }
         data[1].mutate((prev)  => [...prev, ...d]);
     }
-    console.log(`new len > 300 ? ${data[0]().length > 300}`)
+    console.log(`new len > 300 ? ${data[0]().length > 300} (${data[0]().length}) refetched ? ${refetch[2]()}` )
     //return props.data
 }
 

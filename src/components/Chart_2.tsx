@@ -38,13 +38,17 @@ export default function Chart_2() {
    
     if (el.scrollLeft + clientWidth >= scrollWidth && !dataS.loading) {
       const url = new URL(window.location.href)
-      const q = url.searchParams.get('q') ?? 'q1'
-      const d = url.searchParams.get('data') ? new Date(url.searchParams.get('data')!) : new Date()
+      const q = url.searchParams.get('q')
+      let d = new Date(url.searchParams.get('data')!)
+      if (dataS()!.length === 300 && d.toLocaleDateString() !== new Date().toLocaleDateString() ) {
+        d = new Date()
+        
+      } 
       setRefetch([q, d])
-      // Validate state object
-      if(Boolean(recall()).valueOf()){
+      if(Boolean(recall()).valueOf() && new Date(getParams(refetch())[1]).toLocaleDateString() !== d.toLocaleDateString()){
         history.pushState({}, '', refetch())
       }
+      
       el.scrollLeft = scrollWidth - clientWidth - 20;
     }
     
