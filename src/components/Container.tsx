@@ -1,7 +1,6 @@
-import { onMount, Show } from "solid-js";
+import { Show } from "solid-js";
 import Chart_2 from "./Chart_2";
 import { DataProvider, useData } from "./context";
-const delay = (ms: any) => new Promise(res => setTimeout(res, ms));
 
 function ChartContainer () {
     const da = useData()!.signals['dataAttention']
@@ -53,10 +52,9 @@ function ChartContainer () {
      </div>
    )
 }
-export default function Container () {
-    
+export default function Container (p: {data: any}) {
     return (
-        <DataProvider>
+        <DataProvider data={p.data}>
             <ChartContainer></ChartContainer>
         </DataProvider>
     )

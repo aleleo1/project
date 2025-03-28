@@ -1,6 +1,7 @@
-import { DataPoint } from './../interfaces';
+import type { DataPoint } from './../interfaces';
 import type { AstroIntegration, AstroConfig } from 'astro';
 import mysql from 'mysql2/promise';
+import { formatDate } from '../utils';
 
 // Interface for MySQL connection configuration
 interface MySQLAdapterOptions {
@@ -109,6 +110,17 @@ export default function createMySQLAdapter(options: MySQLAdapterOptions = {}): A
       }
     }
   };
+}
+
+export async function query (date: Date, searchParam: string) {
+    const mysql = new MySQLAdapter();
+        const queries : {[key: string] : any} = {
+        q1 : (date= new Date()) => `SELECT Date AS date, coalesce(VRP,0) AS close FROM modis_etna_nrt where Date <= CURRENT_DATE and EXTRACT(MONTH FROM DATE) >= EXTRACT(MONTH FROM cast('${formatDate(date)}' as DATE) - 6) and vrp is not null ORDER BY date DESC LIMIT 300;`,
+        q2 : 'WITH DATAS AS (SELECT Date AS date, coalesce(VRP,0) AS close, ROW_NUMBER() OVER (PARTITION BY DATE_FORMAT(Date, \'\%Y-\%m\') ORDER BY Date ASC) AS RN FROM modis_etna_nrt where vrp is not null ) SELECT * FROM DATAS ORDER BY date ASC LIMIT 300;'
+      }
+    const data = await mysql.query(queries[searchParam]!(date));
+    return data
+        
 }
 
 // Export the MySQL adapter class for direct usage if needed

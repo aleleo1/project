@@ -1,5 +1,10 @@
 ---
+import { query } from '../db/mysql-adapter'
 import Container from './Container'
+const params = new URL(Astro.request.url).searchParams
+const date = params.get('data')! ? new Date(params.get('data')!) : new Date()
+const q = params.get('q')! ?? 'q1'
+const result = (await query(date, q!))
 ---
 
-	<Container client:only="solid-js"></Container>
+	<Container data={result} client:only="solid-js"></Container>

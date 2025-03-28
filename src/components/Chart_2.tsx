@@ -1,20 +1,23 @@
-import { createEffect, Show , For} from "solid-js";
-import {scaleUtc, max, scaleLinear, utcDay, utcMillisecond, utcHour, utcMinute, utcMonth } from 'd3';
+import { createEffect, Show , For, onMount} from "solid-js";
+import {scaleUtc, max, scaleLinear, utcMonth } from 'd3';
 import { useData } from "./context";
-import { formatDate } from "../utils";
-import { navigate } from "astro:transitions/client";
-
+import { formatDate, getParams } from "../utils";
+import DOMPurify from 'isomorphic-dompurify';
 
 export default function Chart_2() {
   // Sample data (replace with your actual data)
   let chartContainer: SVGSVGElement | undefined;
   let container;
   const da = useData()!.signals['dataAttention']
-  const [dataS, {mutate}] = useData()!.data['data']
+  const [refetch, setRefetch, recall] = useData()!.signals['refetch']
+  const [dataS] = useData()!.data['data']
 
   const margin = { top: 30, right: 50, bottom: 120, left: 100 };
   const width = 350
   const height = 350 - margin.top - margin.bottom;
+
+      
+  onMount(() => history.pushState({}, '', refetch()))
 
   //ASSE X
   const xWidth = () => (utcMonth.count( new Date(dataS()!.at(-1)!.date), new Date(dataS()!.at(0)!.date)) + 1) * 100
@@ -33,7 +36,15 @@ export default function Chart_2() {
     const scrollWidth = el.scrollWidth;
     const clientWidth = el.clientWidth;
    
-    if (el.scrollLeft + clientWidth >= scrollWidth) {
+    if (el.scrollLeft + clientWidth >= scrollWidth && !dataS.loading) {
+      const url = new URL(window.location.href)
+      const q = url.searchParams.get('q') ?? 'q1'
+      const d = url.searchParams.get('data') ? new Date(url.searchParams.get('data')!) : new Date()
+      setRefetch([q, d])
+      // Validate state object
+      if(Boolean(recall()).valueOf()){
+      history.pushState({}, '', refetch())
+      }
       el.scrollLeft = scrollWidth - clientWidth - 20;
     }
     
@@ -42,12 +53,12 @@ export default function Chart_2() {
   createEffect(() => {
 /*     x().domain(extent(dataS()!, d => d.date) as Date[]);
     y().domain([0, max(dataS()!, d => d.close!)! * 1.1]); */
-    console.log(x().domain(), width)
+/*     console.log(x().domain(), width) */
   });
  
   
   return (
-      <div ref={container} style={{ width: '500px', height: '350px', 'overflow-x': 'auto',"overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px'}} onscroll={loadNewData}>
+      <div ref={container} style={{ width: '800px', height: '350px', 'overflow-x': 'auto',"overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px'}} onscroll={loadNewData}>
         <svg ref={chartContainer} style={{ display: 'block' }} width={xWidth() + margin.left + margin.right} height="350" viewBox={`0 0 ${xWidth() + margin.left + margin.right} 350`}>
           <g transform={`translate(${margin.left},${margin.top})`}>
             {/* X-axis */}
@@ -109,7 +120,7 @@ export default function Chart_2() {
              cx={x()(new Date(item.date))} 
              cy={y()(item.close)} 
              fill={da[0]() && da[0]()!.index === index() ? 'orange' : 'steelblue' }
-             r={da[0]() && da[0]()!.index === index() ? '7' : '4' }
+             r={da[0]() && da[0]()!.index === index() ? '5' : '3' }
              onMouseOver={() => (da[1]({...item, index: index()}))}
              onMouseOut={() => (da[1](undefined))}
               ></circle>
