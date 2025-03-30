@@ -2,7 +2,7 @@ import { createContext, createEffect, createResource, createSignal, on, useConte
 import type { DataPoint } from "../interfaces";
 
 
- const AttentionContext = createContext<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[]> }}>();
+ const AttentionContext = createContext<Partial<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[]> }}>>();
 
 export function AttentionProvider(props: any) {
 

@@ -1,16 +1,16 @@
 import { createContext, createEffect, createResource, createSignal, on, useContext, type Accessor, type ResourceReturn, type Setter, type Signal } from "solid-js";
 import type { DataPoint } from "../interfaces";
 import { createQuerySignal, delay, formatDate, getParams } from "../utils";
- const AttentionContext = createContext<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[]> }}>();
+ const AttentionContext = createContext<Partial<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[]> }}>>();
 
 export function DataProvider(props: any) {
 
 const refetch = createQuerySignal(props.initialState);
-const data = createResource<DataPoint[]>(refetch[2] ,() => props.data, {initialValue: props.data, deferStream: false})
+const data = createResource<DataPoint[]>(refetch.at(2),() => props.data, {initialValue: props.data, deferStream: false})
 
 createEffect(on(refetch[0], fetchData, {defer: true}))
 async function fetchData() {
-    if (refetch[2]()){
+    if (refetch.at(2)!()){
         console.log('fetching data...')
         const response = await fetch(`/api/data${refetch[0]()}`, { method: 'GET',
             headers: {
@@ -22,7 +22,7 @@ async function fetchData() {
         const d = await response.json()
         if (d.length === 0) {
             console.log('nothing else')
-            refetch[3](false)
+            refetch.at(3)!(false)
         } else {
             data[1].mutate((prev)  => [...prev, ...d]);
         }

@@ -1,4 +1,4 @@
-import { createEffect, Show , For, onMount} from "solid-js";
+import { createEffect, Show , For, onMount, type Accessor} from "solid-js";
 import {scaleUtc, max, scaleLinear, utcMonth } from 'd3';
 import { useData } from "./dataContext";
 import { formatDate, getParams } from "../utils";
@@ -9,9 +9,11 @@ export default function Chart_2() {
   // Sample data (replace with your actual data)
   let chartContainer: SVGSVGElement | undefined;
   let container;
-  const da = useAttention()!.signals['dataAttention']
-  const [refetch, setRefetch, recall] = useData()!.signals['refetch']
-  const [dataS] = useData()!.data['data']
+  const da = useAttention()!.signals!['dataAttention']
+  const rf = useData()!.signals!['refetch']
+  const [refetch, setRefetch] = rf
+  const recall = rf.at(2)
+  const [dataS] = useData()!.data!['data']
   const margin = { top: 30, right: 50, bottom: 120, left: 100 };
   const width = 350
   const height = 350 - margin.top - margin.bottom;
@@ -39,10 +41,10 @@ export default function Chart_2() {
       const q = url.searchParams.get('q')
       let d = new Date(url.searchParams.get('data')!)
       setRefetch([q, d])
-      if(Boolean(recall()).valueOf()){
+      if(recall!()){
         history.pushState([], '', refetch())
       }
-     console.log('scroll effect', refetch(), )
+     console.log('scroll effect', refetch(), recall!())
       
       el.scrollLeft = scrollWidth - clientWidth - 20;
     }

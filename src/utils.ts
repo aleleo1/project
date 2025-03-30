@@ -1,5 +1,13 @@
-import { type Accessor, type Setter, type Signal, createSignal } from "solid-js";
+import { type Signal, createSignal } from "solid-js";
 const DEFAULT_RIF = new Date()
+
+
+export const get_DEFAULT_INITIAL_STATE = () => {
+  const DEFAULT_DATE = new Date()
+  DEFAULT_DATE.setMonth(DEFAULT_DATE.getMonth() - 6)
+  return [DEFAULT_DATE, 'q1', DEFAULT_RIF]
+}
+
 export const delay = (ms: any) => new Promise(res => setTimeout(res, ms));
 export  const formatDate = (d: Date) => ((typeof d === 'string' ? d : d.toISOString()).replace('T', ' ').slice(0, 10)) 
 

@@ -13,7 +13,7 @@ else {
 	date.setMonth(date.getMonth() - 6)
 }
 
-const result = (await query(date, q!, rif))
+const result = (await query(date, q!, rif, true))
 ---
 
 	<Container data={result} initialState={[q, date, rif]} client:only="solid-js"></Container>

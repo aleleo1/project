@@ -112,13 +112,13 @@ export default function createMySQLAdapter(options: MySQLAdapterOptions = {}): A
   };
 }
 
-export async function query (date: Date, searchParam: string, rif: Date, defaultInterval = 6) {
+export async function query (date: Date, searchParam: string, rif: Date, full = false) {
     const mysql = new MySQLAdapter();
     function getMonthDifference(date1: Date, date2: Date) {
       return (date2.getFullYear() - date1.getFullYear()) * 12 + 
       (date2.getMonth() - date1.getMonth());
   }
-    if (Math.abs(getMonthDifference(rif, date)) > 6) {
+    if (Math.abs(getMonthDifference(rif, date)) > 6 && !full) {
       rif = new Date(date)
       rif.setMonth(rif.getMonth() + 6)
     } 
