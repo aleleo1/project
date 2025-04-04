@@ -17,3 +17,26 @@ const result = (await query(date, q!, rif, true))
 ---
 
 	<Container data={result} initialState={[q, date, rif]} client:only="solid-js"></Container>
+<style is:global>
+  .invisible-clickable {
+        fill: transparent;
+        cursor: pointer;
+      }
+	  .tooltip {
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .invisible-clickable:hover + .tooltip {
+        opacity: 1;
+      }
+      .tooltip-bg {
+        fill: #333;
+        rx: 4;
+        ry: 4;
+      }
+      .tooltip-text {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        fill: white;
+      }
+</style>

@@ -1,4 +1,4 @@
-import { createEffect, Show , For, onMount, type Accessor} from "solid-js";
+import { createEffect, Show , For, onMount, type Accessor, createSignal, batch, createMemo} from "solid-js";
 import {scaleUtc, max, scaleLinear, utcMonth } from 'd3';
 import { useData } from "./dataContext";
 import { formatDate, getParams } from "../utils";
@@ -10,56 +10,49 @@ export default function Chart_2() {
   let chartContainer: SVGSVGElement | undefined;
   let container;
   const da = useAttention()!.signals!['dataAttention']
-  const rf = useData()!.signals!['refetch']
-  const [refetch, setRefetch] = rf
-  const recall = rf.at(2)
   const [dataS] = useData()!.data!['data']
+  const refetch = useData()!.signals!['refetch']
   const margin = { top: 30, right: 50, bottom: 120, left: 100 };
-  const width = 350
   const height = 350 - margin.top - margin.bottom;
+  const [isFullView, setFullView] = useAttention()!.signals!['fullView']
+  const {loadNewData, loadNewDataWithScroll} = useData()!.functions
 
-      
+  onMount(() => {
+
+    const parent = container!.parentElement
+    console.log(parent.children[0])
+    if (Array.from(parent.children).every((c: any) => !['load'].includes(c.id as string))){
+    }
+  })      
 
   //ASSE X
-  const xWidth = () => (utcMonth.count( new Date(dataS()!.at(-1)!.date), new Date(dataS()!.at(0)!.date)) + 1) * 100
+  const defaultWidth = 800
+  const divWidth = () =>  defaultWidth + (!isFullView() ? 0 : (margin.left + margin.right))
+  const xWidth = () => !isFullView()  ? (utcMonth.count( new Date(dataS()!.at(-1)!.date), new Date(dataS()!.at(0)!.date)) + 1) * 100 : defaultWidth
+  const fullWidth = () => (!isFullView() ? xWidth() : defaultWidth) + margin.left + margin.right 
   const range = () => [0, xWidth()]
-  const x = () => scaleUtc([new Date(dataS()![0].date), new Date(dataS()!.at(-1)!.date)], range())
+  const x = createMemo(() => scaleUtc([new Date(dataS()![0].date), new Date(dataS()!.at(-1)!.date)], range()))
 
   //ASSE Y
   const yScale = scaleLinear()
   .nice()
   .range([height, 0]);
-  const y = () => yScale.domain([0, max(dataS()!, d => d.close)!])
-
-  function loadNewData(event: any) {
-    const el = event.target;
-    const scrollWidth = el.scrollWidth;
-    const clientWidth = el.clientWidth;
-   
-    if (el.scrollLeft + clientWidth >= scrollWidth && !dataS.loading) {
-      const url = new URL(window.location.href)
-      const q = url.searchParams.get('q')
-      let d = new Date(url.searchParams.get('data')!)
-      setRefetch([q, d])
-      if(recall!()){
-        history.pushState([], '', refetch())
-      }
-     console.log('scroll effect', refetch(), recall!())
-      
-      el.scrollLeft = scrollWidth - clientWidth - 20;
-    }
-    
-  }
+  const y = createMemo(() => yScale.domain([0, max(dataS()!, d => d.close)!]))
  
   
   return (
-      <div ref={container} style={{ width: '800px', height: '350px', 'overflow-x': 'auto',"overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px'}} onscroll={loadNewData}>
-        <svg ref={chartContainer} style={{ display: 'block' }} width={xWidth() + margin.left + margin.right} height="350" viewBox={`0 0 ${xWidth() + margin.left + margin.right} 350`}>
+      <div ref={container} style={{ width: `${divWidth()}`, height: '350px', 'overflow-x': 'auto',"overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px'}} onscroll={loadNewDataWithScroll}>
+        <svg ref={chartContainer} style={{ display: 'block' }} width={fullWidth()} height="350" viewBox={`0 0 ${fullWidth()} 350`}>
+          <rect class="invisible-clickable" x={fullWidth() - 200} y="0" width="200" height="350" onClick={() => {console.log('click'); loadNewData()}} />
+          <g class="tooltip" >
+            <rect class="toolti p-bg" x={fullWidth() - 104} y="0" width="95" height="25"  />
+            <text class="tooltip-text" x={fullWidth() - 100} y="16">{refetch.at(2)!() ? 'Load more data' : 'No more data'}</text>
+          </g>
           <g transform={`translate(${margin.left},${margin.top})`}>
             {/* X-axis */}
             <g transform={`translate(0,${height})`} fill="none" font-size="10" font-family="sans-serif"
               text-anchor="middle">
-              <path class="domain" stroke="currentColor" d={`M0,6V0H${xWidth() + margin.left + margin.right}V6`}></path>
+              <path class="domain" stroke="currentColor" d={`M0,6V0H${fullWidth()}V6`}></path>
               <For each={x().ticks(utcMonth.every(1)!)}>{(item, index) => (
                 <g class="tick" opacity="1" transform={`translate(${x()(new Date(item))},35)`}>
                   <line stroke="currentColor" transform={`translate(0,-36)`} y2="12"></line>
@@ -87,7 +80,7 @@ export default function Chart_2() {
               <For each={y().ticks(10)}>{(tick) => (
                 <line 
                   x1="0" 
-                  x2={xWidth() + margin.left + margin.right} 
+                  x2={fullWidth()} 
                   y1={y()(tick)} 
                   y2={y()(tick)} 
                   stroke="#e0e0e0" 
@@ -105,7 +98,7 @@ export default function Chart_2() {
                 x2={x()(new Date(item.date))}
                 y2={y()(item.close)}
                 stroke="steelblue"
-                stroke-width="1"
+                stroke-width="0.5"
               />
             )}</For>
 
@@ -116,8 +109,8 @@ export default function Chart_2() {
              cy={y()(item.close)} 
              fill={da[0]() && da[0]()!.index === index() ? 'orange' : 'steelblue' }
              r={da[0]() && da[0]()!.index === index() ? '5' : '3' }
-             onMouseOver={() => (da[1]({...item, index: index()}))}
-             onMouseOut={() => (da[1](undefined))}
+             onMouseOver={() => (batch(() => da[1]({...item, index: index()})))}
+             onMouseOut={() => (batch(() => da[1](undefined)))}
               ></circle>
             )}</For>
           </g>
@@ -131,7 +124,8 @@ export default function Chart_2() {
                     width="120" 
                     height="50" 
                     rx="4" 
-                    fill="rgba(0,0,0,0.8)">
+                    fill="rgba(0,0,0,0.8)"
+                    opacity="1">
                   </rect>
                   <text 
                     x={`${x()(new Date(da[0]()!.date)) + 50}`}  
@@ -150,6 +144,7 @@ export default function Chart_2() {
                   </text>
             </g>
           </Show>
+         
         </svg>
         
       </div>

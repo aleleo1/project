@@ -7,8 +7,8 @@ import type { DataPoint } from "../interfaces";
 export function AttentionProvider(props: any) {
 
 const dataAttention = createSignal<DataPoint | undefined>(undefined)
-
-const provider = {signals: {dataAttention}}
+const fullView = createSignal(false)
+const provider = {signals: {dataAttention,fullView}}
 
     return (
         

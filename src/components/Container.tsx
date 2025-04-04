@@ -7,11 +7,14 @@ function ChartContainer () {
     const da = useAttention()!.signals!['dataAttention']
     const data = useData()!.data!['data']
     const [refetch] = useData()!.signals!['refetch']
+  const [isFullView, setFullView] = useAttention()!.signals!['fullView']
+
     onMount(() => {if(!new URL(location.href).searchParams.get('rif')) {history.pushState({}, '', refetch())}})
     return (
        <div class="flex flex-row gap-28 items-center justify-center w-full overflow-hidden">
-        <p class="w-10">{da[0]() ? da[0]()!.date.toString() : ''}</p>
+       
        <img class="w-64 h-64" alt="no img" />
+       <input type="checkbox" onChange={(ev) => setFullView(ev.target.checked) } checked={isFullView()}/>
        <Show when={!data[0].error && data[0]()!.length}>
             <Chart_2></Chart_2>
        </Show>

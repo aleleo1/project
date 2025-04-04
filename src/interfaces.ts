@@ -14,3 +14,8 @@ export interface DataPoint {
       port?: number;
       connectionLimit?: number;
   }
+
+export interface Stato {
+  full?: boolean;
+
+}

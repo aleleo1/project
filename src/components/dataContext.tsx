@@ -1,7 +1,7 @@
 import { createContext, createEffect, createResource, createSignal, on, useContext, type Accessor, type ResourceReturn, type Setter, type Signal } from "solid-js";
 import type { DataPoint } from "../interfaces";
 import { createQuerySignal, delay, formatDate, getParams } from "../utils";
- const AttentionContext = createContext<Partial<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[]> }}>>();
+ const AttentionContext = createContext<Partial<{signals: {[key :string ]: Signal<any>}, data: {[key :string ]: ResourceReturn<DataPoint[]> }, functions: {[key: string]: () => any}}>>();
 
 export function DataProvider(props: any) {
 
@@ -31,10 +31,33 @@ async function fetchData() {
     }
 }
 
+function loadNewDataWithScroll(event: any) {
+    const el = event.target;
+    const scrollWidth = el.scrollWidth;
+    const clientWidth = el.clientWidth;
+   
+    if (el.scrollLeft + clientWidth >= scrollWidth && !data[0].loading) {
+     loadNewData()
+      
+      el.scrollLeft = scrollWidth - clientWidth - 20;
+    }
+    
+}
+
+function loadNewData() {
+    const url = new URL(window.location.href)
+    const q = url.searchParams.get('q')
+    let d = new Date(url.searchParams.get('data')!)
+    refetch[1]([q, d])
+    if(refetch.at(2)!()){
+      history.pushState([], '', refetch.at(0)!())
+    }
+}
 
 
 
-const provider = {signals: {refetch}, data: {data}}
+
+const provider = {signals: {refetch}, data: {data}, functions: {loadNewDataWithScroll, loadNewData}}
 
     return (
         
