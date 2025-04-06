@@ -8,7 +8,7 @@ const { MYSQL_HOST,
   MYSQL_USER,
   MYSQL_PASSWORD,
   MYSQL_DATABASE,
-  MYSQL_PORT  } = loadEnv(process.env.NODE_ENV, process.cwd(), "");
+  MYSQL_PORT  } = loadEnv(process.env.NODE_ENV!, process.cwd(), "");
 // Interface for MySQL connection configuration
 interface MySQLAdapterOptions {
   host?: string;
@@ -71,7 +71,7 @@ class MySQLAdapter {
     }
 
     try {
-      const [results] = await this.pool!.execute<DataPoint[]>(sql, params);
+      const [results] = await this.pool!.execute<any>(sql, params);
       return results;
     } catch (error) {
       console.error('MySQL query execution error:', error);
@@ -133,7 +133,7 @@ export async function query (date: Date, searchParam: string, rif: Date, full = 
         q1 : (date= new Date()) => `SELECT Date AS date, coalesce(VRP,0) AS close FROM modis_etna_nrt where Date <= cast('${formatDate(rif)}' as DATE) and DATE >=  cast('${formatDate(date)}' as DATE) and vrp is not null ORDER BY date DESC;`,
         q2 : 'WITH DATAS AS (SELECT Date AS date, coalesce(VRP,0) AS close, ROW_NUMBER() OVER (PARTITION BY DATE_FORMAT(Date, \'\%Y-\%m\') ORDER BY Date ASC) AS RN FROM modis_etna_nrt where vrp is not null ) SELECT * FROM DATAS ORDER BY date ASC LIMIT 300;'
       }
-    const data = await mysql.query(queries[searchParam]!(date));
+    const data: DataPoint[] = await mysql.query(queries[searchParam]!(date));
     return data
         
 }
