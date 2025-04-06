@@ -2,7 +2,13 @@ import type { DataPoint } from './../interfaces';
 import type { AstroIntegration, AstroConfig } from 'astro';
 import mysql from 'mysql2/promise';
 import { formatDate } from '../utils';
+import { loadEnv } from "vite";
 
+const { MYSQL_HOST,
+  MYSQL_USER,
+  MYSQL_PASSWORD,
+  MYSQL_DATABASE,
+  MYSQL_PORT  } = loadEnv(process.env.NODE_ENV, process.cwd(), "");
 // Interface for MySQL connection configuration
 interface MySQLAdapterOptions {
   host?: string;
@@ -15,11 +21,11 @@ interface MySQLAdapterOptions {
 
 // Default configuration with fallback to environment variables
 const DEFAULT_CONFIG: MySQLAdapterOptions = {
-  host: import.meta.env.MYSQL_HOST || 'localhost',
-  user: import.meta.env.MYSQL_USER || 'ufpv_manager',
-  password: import.meta.env.MYSQL_PASSWORD,
-  database: import.meta.env.MYSQL_DATABASE || 'ingv',
-  port: import.meta.env.MYSQL_PORT ? parseInt(import.meta.env.MYSQL_PORT as string) : 3306,
+  host: MYSQL_HOST,
+  user: MYSQL_USER,
+  password: MYSQL_PASSWORD,
+  database: MYSQL_DATABASE,
+  port: MYSQL_PORT ? parseInt(MYSQL_PORT as string) : 3306,
   connectionLimit: 10
 };
 
