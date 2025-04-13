@@ -1,4 +1,4 @@
-import type { Signal, ResourceReturn } from "solid-js";
+import type { Signal, ResourceReturn, Accessor } from "solid-js";
 
 export interface DataPoint {
   date: Date;
@@ -43,4 +43,4 @@ export type UrlParams =
 
 export type ContainerData = { result: Data[], state: QueryParams }
 
-export type Context = Partial<{ signals: { [key: string]: Signal<any> }, data: { [key: string]: ResourceReturn<Data[]> }, functions: { [key: string]: () => any } }>
+export type Context = Partial<{ signals: { [key: string]: Signal<any> }, data: { [key: string]: ResourceReturn<Data[]> }, functions: { [key: string]: () => any }, accessors: { [key: string]: Accessor<any> }, constants: {[key: string]: any} }>

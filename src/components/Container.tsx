@@ -1,8 +1,9 @@
 import { Show } from "solid-js";
 import Chart_2 from "./Chart_2";
-import { DataProvider, useData } from "./dataContext";
-import { AttentionProvider, useAttention } from "./attentionContext";
+import { DataProvider, useData } from "../contexts/dataContext";
+import { AttentionProvider, useAttention } from "../contexts/attentionContext";
 import type { Data, QueryParams } from "../interfaces";
+import { ChartProvider } from "../contexts/chartContext";
 function ChartContainer() {
   const data = useData()!.data!['data']
   const [isFullView, setFullView] = useAttention()!.signals!['fullView']
@@ -13,7 +14,9 @@ function ChartContainer() {
         <img class="w-64 h-64" alt="no img" />
         <input type="checkbox" class="w-10  " onChange={(ev) => setFullView(ev.target.checked)} checked={isFullView()} />
         <Show when={!data[0].error && data[0]()!.length}>
-          <Chart_2></Chart_2>
+          <ChartProvider>
+            <Chart_2></Chart_2>
+          </ChartProvider>
         </Show>
       </div>
       {<p class="h-8">{dataAttention[0]() ? JSON.stringify(dataAttention[0]()) : ''}</p>}

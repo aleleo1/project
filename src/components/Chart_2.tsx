@@ -1,86 +1,27 @@
-import { Show, For, onMount, batch, createMemo, createSignal, createEffect, on } from "solid-js";
-import { scaleUtc, max, scaleLinear, utcMonth, utcDay } from 'd3';
-import { useData } from "./dataContext";
-import { formatDate, searchParamsToObject } from "../utils";
-import { useAttention } from "./attentionContext";
-import { DEFAULT_INITIAL_STATE } from "../constants";
+import { For, onMount, batch } from "solid-js";
+import { useData } from "../contexts/dataContext";
+import { formatDate } from "../utils";
+import { useAttention } from "../contexts/attentionContext";
+import { useChart } from "../contexts/chartContext";
 
 export default function Chart_2() {
   let chartContainer: SVGSVGElement | undefined;
   let container;
-  const da = useAttention()!.signals!['dataAttention']
-  const [dataS] = useData()!.data!['data']
-  const refetch = useData()!.signals!['refetch']
-  const margin = { top: 30, right: 50, bottom: 120, left: 100 };
-  const height = 350 - margin.top - margin.bottom;
-  const [isFullView,] = useAttention()!.signals!['fullView']
   const { loadNewData, loadNewDataWithScroll } = useData()!.functions as any
-  const numOfLoads = createSignal(1)
-  createEffect(on(refetch[0], () => {
-    numOfLoads[1](numOfLoads[0]() + 1)
-  }, { defer: true }))
+  const da = useAttention()!.signals!['dataAttention']
+  const { divWidth, y, containerClass, getXTicks, x, fullWidth } = useChart()!.accessors as any
+  const { margin, height } = useChart()!.constants as any
+  const refetch = useData()!.signals!['refetch']
+
+  const [dataS] = useData()!.data!['data']
+
   onMount(() => {
     const parent = container!.parentElement
     if (Array.from(parent.children).every((c: any) => !['load'].includes(c.id as string))) {
     }
   })
 
-  //ASSE X
-  const defaultWidth = 800
-  // Memoize date calculations to avoid repeated conversions
-  const getFirstDate = createMemo(() => {
-    const data = batch(()=>searchParamsToObject(refetch[0](), DEFAULT_INITIAL_STATE).date)
-    return data
-  });
 
-  const getLastDate = createMemo(() => {
-    const data = dataS();
-    return data && data.length > 0 ? new Date(data[data.length - 1].date) : new Date();
-  });
-
-  // Prevent unnecessary recalculations with proper dependency tracking
-  const middleX = createMemo(() => {
-    const firstDate = getFirstDate();
-    const lastDate = getLastDate();
-    return (utcMonth.count(lastDate, firstDate) + 1) * 100;
-  });
-
-  const xWidth = createMemo(() => {
-    const isFullViewValue = isFullView();
-    const middleXValue = middleX();
-    return !isFullViewValue && middleXValue > defaultWidth ? middleXValue : defaultWidth;
-  });
-
-  const divWidth = createMemo(() => {
-    const isFullViewValue = isFullView();
-    return defaultWidth + (isFullViewValue ? (margin.left + margin.right) : 0);
-  });
-
-  const range = createMemo(() => [0, xWidth()]);
-
-  const fullWidth = createMemo(() => {
-    const isFullViewValue = isFullView();
-    const xWidthValue = xWidth();
-    return (!isFullViewValue ? xWidthValue : defaultWidth) + margin.left + margin.right;
-  });
-
-  const x = createMemo(() => {
-    const firstDate = new Date();
-    const lastDate = getLastDate();
-    const rangeValue = range();
-    return scaleUtc([firstDate, lastDate], rangeValue);
-  });
-
-  const getXTicks = createMemo(() => Array.from({ length: (10 * (!isFullView() ? numOfLoads[0]() : 1)) }, (_, i) =>
-    new Date(new Date().getTime() + (i / (10 * (!isFullView() ? numOfLoads[0]() : 1))) * (getLastDate().getTime() - new Date().getTime()))
-  ))
-
-  //ASSE Y
-  const yScale = scaleLinear()
-    .nice()
-    .range([height, 0]);
-  const y = createMemo(() => yScale.domain([0, max(dataS()!, d => d.close)! ?? 1]))
-  const containerClass = createMemo(() => isFullView() ? `w-[${defaultWidth}px]` : 'w-full md:w-96 lg:w-[960px]')
   return (
     <div class={`p-10 ${containerClass()}`}>
       <div ref={container} style={{ 'width': `${divWidth()}`, height: '350px', 'overflow-x': 'auto', "overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px' }} onscroll={loadNewDataWithScroll}>
