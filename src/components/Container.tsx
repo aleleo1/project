@@ -8,15 +8,15 @@ function ChartContainer() {
   const [isFullView, setFullView] = useAttention()!.signals!['fullView']
   const dataAttention = useAttention()!.signals!['dataAttention']
   return (
-    <div class="flex flex-row gap-28 items-center justify-center w-full overflow-hidden">
-      <img class="w-64 h-64" alt="no img" />
-      <input type="checkbox" onChange={(ev) => setFullView(ev.target.checked)} checked={isFullView()} />
-      <div class="flex flex-col">
+    <div class="flex flex-col">
+      <div class="flex flex-row gap-28 items-center justify-center w-full overflow-hidden">
+        <img class="w-64 h-64" alt="no img" />
+        <input type="checkbox" class="w-10  " onChange={(ev) => setFullView(ev.target.checked)} checked={isFullView()} />
         <Show when={!data[0].error && data[0]()!.length}>
           <Chart_2></Chart_2>
-          {<p class="h-8">{dataAttention[0]() ? JSON.stringify(dataAttention[0]()) : ''}</p>}
         </Show>
       </div>
+      {<p class="h-8">{dataAttention[0]() ? JSON.stringify(dataAttention[0]()) : ''}</p>}
     </div>
   )
 }
