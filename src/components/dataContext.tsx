@@ -1,19 +1,21 @@
 import { createContext, createEffect, createResource, on, onMount, useContext } from "solid-js";
 import type { Context, Data } from "../interfaces";
 import { createQuerySignal, extractStates, formatDate, searchParamsToObject, updateMainURL } from "../utils";
-import  { DEFAULT_INITIAL_STATE } from "../constants";
+import { DEFAULT_INITIAL_STATE } from "../constants";
 const DataContext = createContext<Context>();
 
 export function DataProvider(props: any) {
 
     //history.pushState({}, '', )
     const refetch = createQuerySignal(props.url);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     const data = createResource<Data[]>(refetch.at(2), () => props.data, { initialValue: props.data, deferStream: false })
     onMount(() => {
         window.addEventListener('popstate', () => {
             if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date)
                 console.log('RELOADING')
-                window.location.reload()
+            window.location.reload()
         })
     })
     createEffect(on(refetch[0], fetchData, { defer: true }))
@@ -35,6 +37,8 @@ export function DataProvider(props: any) {
         const d = await response.json()
         if (d.length === 0) {
             console.log('nothing else')
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             refetch.at(3)!(false)
         } else {
             data[1].mutate((prev) => [...prev, ...d]);
@@ -63,6 +67,8 @@ export function DataProvider(props: any) {
         const d = new Date(url.searchParams.get('date')!)
         d.setMonth(d.getMonth() - 6)
         if (refetch.at(2)!()) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             refetch[1]({ q: q, date: formatDate(d), action: 'partial' })
         }
     }
@@ -75,7 +81,8 @@ export function DataProvider(props: any) {
     const provider = { signals: { refetch }, data: { data }, functions: { loadNewDataWithScroll, loadNewData } }
 
     return (
-
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         <DataContext.Provider value={provider}>
 
             {props.children}
