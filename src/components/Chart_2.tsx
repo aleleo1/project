@@ -1,5 +1,5 @@
-import { Show, For, onMount, batch, createMemo } from "solid-js";
-import { scaleUtc, max, scaleLinear, utcMonth } from 'd3';
+import { Show, For, onMount, batch, createMemo, createSignal, createEffect, on } from "solid-js";
+import { scaleUtc, max, scaleLinear, utcMonth, utcDay } from 'd3';
 import { useData } from "./dataContext";
 import { formatDate } from "../utils";
 import { useAttention } from "./attentionContext";
@@ -14,12 +14,14 @@ export default function Chart_2() {
   const height = 350 - margin.top - margin.bottom;
   const [isFullView,] = useAttention()!.signals!['fullView']
   const { loadNewData, loadNewDataWithScroll } = useData()!.functions as any
-
+  const numOfLoads = createSignal(1)
+  createEffect(on(refetch[0], () => {
+    numOfLoads[1](numOfLoads[0]() + 1)
+  }, { defer: true }))
   onMount(() => {
     const parent = container!.parentElement
     if (Array.from(parent.children).every((c: any) => !['load'].includes(c.id as string))) {
     }
-    console.log(max(dataS()!, d => d.close)! ?? 1)
   })
 
   //ASSE X
@@ -68,6 +70,10 @@ export default function Chart_2() {
     return scaleUtc([firstDate, lastDate], rangeValue);
   });
 
+  const getXTicks = createMemo(() => Array.from({ length: (10 * (!isFullView() ? numOfLoads[0]() : 1)) }, (_, i) =>
+    new Date(getFirstDate().getTime() + (i / (10 * (!isFullView() ? numOfLoads[0]() : 1))) * (getLastDate().getTime() - getFirstDate().getTime()))
+  ))
+
   //ASSE Y
   const yScale = scaleLinear()
     .nice()
@@ -87,7 +93,7 @@ export default function Chart_2() {
           <g transform={`translate(0,${height})`} fill="none" font-size="10" font-family="sans-serif"
             text-anchor="middle">
             <path class="domain" stroke="currentColor" d={`M0,6V0H${fullWidth()}V6`}></path>
-            <For each={x().ticks(utcMonth.every(1)!)}>{(item, index) => (
+            <For each={getXTicks()}>{(item, index) => (
               <g class="tick" opacity="1" transform={`translate(${x()(new Date(item))},35)`}>
                 <line stroke="currentColor" transform={`translate(0,-36)`} y2="12"></line>
                 <line stroke="currentColor" transform={`translate(0,-24) rotate(45)`} y2="12"></line>
@@ -147,36 +153,6 @@ export default function Chart_2() {
             ></circle>
           )}</For>
         </g>
-
-        {/* ToolTip */}
-        <Show when={da[0]()}>
-          <g class="tooltip" style="pointer-events: none;">
-            <rect
-              x={`${x()(new Date(da[0]()!.date))}`}
-              y={`${y()(da[0]()!.close) - 30}`}
-              width="120"
-              height="50"
-              rx="4"
-              fill="rgba(0,0,0,0.8)"
-              opacity="1">
-            </rect>
-            <text
-              x={`${x()(new Date(da[0]()!.date)) + 50}`}
-              y={`${y()(da[0]()!.close) - 15}`}
-              font-size="12px"
-              fill="white"
-              text-anchor="start"
-              alignment-baseline="middle"
-            >
-              <tspan x={x()(new Date(da[0]()!.date)) + 5} dy="0">
-                {formatDate(da[0]()!.date)}
-              </tspan>
-              <tspan x={x()(new Date(da[0]()!.date)) + 5} dy="20">
-                {da[0]()!.close ? parseInt(da[0]()!.close) : 0}
-              </tspan>
-            </text>
-          </g>
-        </Show>
 
       </svg>
 

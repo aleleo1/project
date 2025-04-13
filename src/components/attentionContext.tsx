@@ -1,4 +1,4 @@
-import { createContext, createSignal, useContext, } from "solid-js";
+import { createContext, createEffect, createSignal, useContext, } from "solid-js";
 import type { Context, DataPoint } from "../interfaces";
 
 
@@ -9,7 +9,6 @@ export function AttentionProvider(props: any) {
     const dataAttention = createSignal<DataPoint | undefined>(undefined)
     const fullView = createSignal(true)
     const provider = { signals: { dataAttention, fullView } }
-
     return (
 
         <AttentionContext.Provider value={provider}>

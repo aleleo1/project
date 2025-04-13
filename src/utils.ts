@@ -27,7 +27,6 @@ export function createQuerySignal(url: string) {
 
     // Custom setter that takes an array of strings
     (input: Partial<QueryParams>) => {
-      console.log('setting value: ', input)
       setValue(updateUrl(getValue(), input).toString());
     },
     () => { return callable() },

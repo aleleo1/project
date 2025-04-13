@@ -1,4 +1,4 @@
-import { createContext, createEffect, createResource, on, onMount, useContext } from "solid-js";
+import { createContext, createEffect, createResource, createSignal, on, onMount, useContext } from "solid-js";
 import type { Context, Data } from "../interfaces";
 import { createQuerySignal, extractStates, formatDate, searchParamsToObject, updateMainURL } from "../utils";
 import { DEFAULT_INITIAL_STATE } from "../constants";
@@ -8,6 +8,7 @@ export function DataProvider(props: any) {
 
     //history.pushState({}, '', )
     const refetch = createQuerySignal(props.url);
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const data = createResource<Data[]>(refetch.at(2), () => props.data, { initialValue: props.data, deferStream: false })
@@ -21,7 +22,6 @@ export function DataProvider(props: any) {
     })
     createEffect(on(refetch[0], fetchData, { defer: true }))
     async function fetchData() {
-
         console.log('fetching data...', refetch[0]())
         const fetchUrl = new URL(refetch[0]())
         console.log(fetchUrl)
