@@ -86,7 +86,6 @@ export function updateMainURL(main: string, partial: string, index: number) {
   } else {
     states.push(encodeURIComponent(partial))
   }
-  console.log(states)
   mainURL.searchParams.set('c', JSON.stringify(states))
   return mainURL.toString()
 }

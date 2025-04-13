@@ -8,7 +8,6 @@ export const GET: APIRoute = async (req) => {
     const q = params.get('q')!
     const rif = new Date(params.get('rif')!)
     const action = params.get('action')!
-    console.log(params)
     const result = (await query_full(date, q!, rif, action))
     return new Response(JSON.stringify(result), {
       status: 200,

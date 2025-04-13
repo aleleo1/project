@@ -36,18 +36,11 @@ export interface QueryParams {
   rif: Date;
 }
 export type UrlParams =
-{ c: QueryParams[]
-}
-export enum Actions {
-  full = 'f',
-  partial = 'p'
-}
-
-export enum Queries {
-  default = 'q1'
-}
+  {
+    c: QueryParams[]
+  }
 
 
-export type ContainerData = { result: Data[], state: QueryParams}
+export type ContainerData = { result: Data[], state: QueryParams }
 
 export type Context = Partial<{ signals: { [key: string]: Signal<any> }, data: { [key: string]: ResourceReturn<Data[]> }, functions: { [key: string]: () => any } }>

@@ -17,6 +17,7 @@ export function DataProvider(props: any) {
                 console.log('RELOADING')
             window.location.reload()
         })
+
     })
     createEffect(on(refetch[0], fetchData, { defer: true }))
     async function fetchData() {
@@ -52,10 +53,8 @@ export function DataProvider(props: any) {
         const el = event.target;
         const scrollWidth = el.scrollWidth;
         const clientWidth = el.clientWidth;
-
         if (el.scrollLeft + clientWidth >= scrollWidth && !data[0].loading) {
             loadNewData()
-
             el.scrollLeft = scrollWidth - clientWidth - 20;
         }
 
