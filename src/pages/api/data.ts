@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import {query_full} from '../../db/mysql-adapter';
+import { query_full } from '../../db/mysql-adapter';
 
 export const GET: APIRoute = async (req) => {
   try {
@@ -17,7 +17,7 @@ export const GET: APIRoute = async (req) => {
       }
     });
   } catch (error) {
-    return new Response(JSON.stringify({ 
+    return new Response(JSON.stringify({
       error: 'Failed to fetch data',
       details: error instanceof Error ? error.message : 'Unknown error'
     }), {

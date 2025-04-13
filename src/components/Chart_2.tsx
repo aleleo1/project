@@ -12,7 +12,7 @@ export default function Chart_2() {
   const refetch = useData()!.signals!['refetch']
   const margin = { top: 30, right: 50, bottom: 120, left: 100 };
   const height = 350 - margin.top - margin.bottom;
-  const [isFullView, ] = useAttention()!.signals!['fullView']
+  const [isFullView,] = useAttention()!.signals!['fullView']
   const { loadNewData, loadNewDataWithScroll } = useData()!.functions as any
 
   onMount(() => {
