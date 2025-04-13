@@ -1,42 +1,81 @@
 ---
-import { query } from '../db/mysql-adapter'
-import Container from './Container'
-const params = new URL(Astro.request.url).searchParams
-const q = params.get('q')! ?? 'q1'
-const rif = params.get('rif')! ? new Date(params.get('rif')!) : new Date()
-let date = new Date()
+import { query_full } from "../db/mysql-adapter";
+import Container from "./Container";
+import { DEFAULT_INITIAL_STATE } from "../constants";
+import type { UrlParams, QueryParams, ContainerData } from "../interfaces";
+import {
+  updateUrl,
+  searchParamsToObject,
+  extractStates,
+  updateMainURL,
+} from "../utils";
+const mainUrl = new URL(Astro.request.url);
+const params = mainUrl.searchParams;
+const containers: Array<ContainerData> = [];
 
-if (params.get('data')){
-	date = new Date(params.get('data')!)
-}
-else {
-	date.setMonth(date.getMonth() - 6)
-}
+let c = params.get("c");
+let state: string[] = [];
+let initialUrl = mainUrl.origin;
 
-const result = (await query(date, q!, rif, true))
+if (!c) {
+  state = [
+    updateUrl(mainUrl.origin, DEFAULT_INITIAL_STATE).toString(),
+    updateUrl(mainUrl.origin, DEFAULT_INITIAL_STATE).toString(),
+  ];
+} else {
+  state = extractStates(params);
+}
+console.log(state);
+for (let i = 0; i < state.length; i++) {
+  const s = searchParamsToObject(
+    new URL(state[i]).searchParams.toString(),
+    DEFAULT_INITIAL_STATE,
+  );
+  s.action = DEFAULT_INITIAL_STATE.action;
+  console.log(s);
+
+  const result = await query_full(s.date, s.q, s.rif, s.action);
+  containers.push({ state: s, result });
+  initialUrl = updateMainURL(initialUrl, updateUrl(mainUrl.origin, s).toString(), i);
+}
+console.log(initialUrl);
 ---
+<span id="tmpUrl" data-value={initialUrl} class="absolute hidden z-100 top-0 left-0"></span>
+<script lang="javascript">
+  window.history.pushState({}, '', document.getElementById('tmpUrl').getAttribute('data-value'))
+</script>
 
-	<Container data={result} initialState={[q, date, rif]} client:only="solid-js"></Container>
+{
+  containers.map(({ result, state }, index) => (
+    <Container
+      data={result}
+      initialState={state}
+      url={updateUrl(mainUrl.origin, state).toString()}
+      index={index}
+      client:only="solid-js"
+    />
+  ))
+}
 <style is:global>
   .invisible-clickable {
-        fill: transparent;
-        cursor: pointer;
-      }
-	  .tooltip {
-        opacity: 0;
-        transition: opacity 0.3s;
-      }
-      .invisible-clickable:hover + .tooltip {
-        opacity: 1;
-      }
-      .tooltip-bg {
-        fill: #333;
-        rx: 4;
-        ry: 4;
-      }
-      .tooltip-text {
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        fill: white;
-      }
+    fill: transparent;
+    cursor: pointer;
+  }
+  .tooltip {
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .invisible-clickable:hover + .tooltip {
+    opacity: 1;
+  }
+  .tooltip-bg {
+    fill: #333;
+    rx: 4;
+    ry: 4;
+  }
+  .tooltip-text {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    fill: white;
+  }
 </style>

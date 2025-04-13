@@ -1,14 +1,15 @@
 import type { APIRoute } from 'astro';
-import {query} from '../../db/mysql-adapter';
+import {query_full} from '../../db/mysql-adapter';
 
 export const GET: APIRoute = async (req) => {
   try {
     const params = req.url.searchParams
-    const date = new Date(params.get('data')!)
+    const date = new Date(params.get('date')!)
     const q = params.get('q')!
     const rif = new Date(params.get('rif')!)
-    
-    const result = (await query(date, q!, rif))
+    const action = params.get('action')!
+    console.log(params)
+    const result = (await query_full(date, q!, rif, action))
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: {
@@ -18,7 +19,7 @@ export const GET: APIRoute = async (req) => {
     });
   } catch (error) {
     return new Response(JSON.stringify({ 
-      error: 'Failed to fetch users',
+      error: 'Failed to fetch data',
       details: error instanceof Error ? error.message : 'Unknown error'
     }), {
       status: 500,

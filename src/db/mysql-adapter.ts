@@ -1,4 +1,4 @@
-import type { DataPoint } from './../interfaces';
+import type { Data, DataPoint } from './../interfaces';
 import type { AstroIntegration, AstroConfig } from 'astro';
 import mysql from 'mysql2/promise';
 import { formatDate } from '../utils';
@@ -8,7 +8,7 @@ const { MYSQL_HOST,
   MYSQL_USER,
   MYSQL_PASSWORD,
   MYSQL_DATABASE,
-  MYSQL_PORT  } = loadEnv(process.env.NODE_ENV!, process.cwd(), "");
+  MYSQL_PORT } = loadEnv(process.env.NODE_ENV!, process.cwd(), "");
 // Interface for MySQL connection configuration
 interface MySQLAdapterOptions {
   host?: string;
@@ -118,25 +118,296 @@ export default function createMySQLAdapter(options: MySQLAdapterOptions = {}): A
   };
 }
 
-export async function query (date: Date, searchParam: string, rif: Date, full = false) {
-    const mysql = new MySQLAdapter();
-    function getMonthDifference(date1: Date, date2: Date) {
-      return (date2.getFullYear() - date1.getFullYear()) * 12 + 
+export async function query(date: Date, searchParam: string, rif: Date, full = false) {
+  const mysql = new MySQLAdapter();
+  function getMonthDifference(date1: Date, date2: Date) {
+    return (date2.getFullYear() - date1.getFullYear()) * 12 +
       (date2.getMonth() - date1.getMonth());
   }
-    if (Math.abs(getMonthDifference(rif, date)) > 6 && !full) {
-      rif = new Date(date)
-      rif.setMonth(rif.getMonth() + 6)
-    } 
+  if (Math.abs(getMonthDifference(rif, date)) > 6 && !full) {
+    rif = new Date(date)
+    rif.setMonth(rif.getMonth() + 6)
+  }
 
-        const queries : {[key: string] : any} = {
-        q1 : (date= new Date()) => `SELECT Date AS date, coalesce(VRP,0) AS close FROM modis_etna_nrt where Date <= cast('${formatDate(rif)}' as DATE) and DATE >=  cast('${formatDate(date)}' as DATE) and vrp is not null ORDER BY date DESC;`,
-        q2 : 'WITH DATAS AS (SELECT Date AS date, coalesce(VRP,0) AS close, ROW_NUMBER() OVER (PARTITION BY DATE_FORMAT(Date, \'\%Y-\%m\') ORDER BY Date ASC) AS RN FROM modis_etna_nrt where vrp is not null ) SELECT * FROM DATAS ORDER BY date ASC LIMIT 300;'
-      }
-    const data: DataPoint[] = await mysql.query(queries[searchParam]!(date));
-    return data
-        
+  const queries: { [key: string]: any } = {
+    q1: (date = new Date()) => `SELECT Date AS date, coalesce(VRP,0) AS close FROM modis_etna_nrt where Date <= cast('${formatDate(rif)}' as DATE) and DATE >=  cast('${formatDate(date)}' as DATE) and vrp is not null ORDER BY date DESC;`,
+    q2: 'WITH DATAS AS (SELECT Date AS date, coalesce(VRP,0) AS close, ROW_NUMBER() OVER (PARTITION BY DATE_FORMAT(Date, \'\%Y-\%m\') ORDER BY Date ASC) AS RN FROM modis_etna_nrt where vrp is not null ) SELECT * FROM DATAS ORDER BY date ASC LIMIT 300;'
+  }
+  const data: DataPoint[] = await mysql.query(queries[searchParam]!(date));
+  return data
+
 }
+
+
+export async function query_full(
+  date: Date,
+  searchParam: string,
+  start: Date,
+  action: string
+): Promise<Data[]> {
+  const mysql = new MySQLAdapter();
+  const partial = action === 'partial'
+  const full = action === 'f'
+  // Helper function to calculate month difference
+  let rif = new Date()
+  // Adjust 'rif' date if needed
+  if (partial) {
+    rif = new Date(date);
+    rif.setMonth(rif.getMonth() + 6);
+  } else if (full) {
+    rif = start
+  }
+
+  // Define queries object
+  const queries: { [key: string]: (date?: Date, rif?: Date) => string } = {
+    // Class (FLAG1): Assessing the Thermal Activity Level
+
+    // No Activity
+    q1: (date = new Date()) => `SELECT Date AS date, coalesce(VRP,0) AS close FROM modis_etna_nrt where Date <= cast('${formatDate(rif)}' as DATE) and DATE >=  cast('${formatDate(date)}' as DATE) and vrp is not null ORDER BY date DESC;`,
+
+    noActivity: (date = new Date(), rif = new Date()) => `
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'MODIS' AS Sensor
+      FROM
+          modis_etna_nrt
+      WHERE
+          VRP IS NULL
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'VIIRS' AS Sensor
+      FROM
+          viirs_etna_nrt
+      WHERE
+          VRP IS NULL
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'SLSTR' AS Sensor
+      FROM
+          slstr_etna_nrt
+      WHERE
+          VRP IS NULL
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE);
+    `,
+
+    // Normal
+    normal: (date = new Date(), rif = new Date()) => `
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'MODIS' AS Sensor
+      FROM
+          modis_etna_nrt
+      WHERE
+          VRP IS NOT NULL AND VRP > 0
+          AND VRP <= 100
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'VIIRS' AS Sensor
+      FROM
+          viirs_etna_nrt
+      WHERE
+          VRP IS NOT NULL AND VRP > 0
+          AND VRP <= 100
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'SLSTR' AS Sensor
+      FROM
+          slstr_etna_nrt
+      WHERE
+          VRP IS NOT NULL AND VRP > 0
+          AND VRP <= 100
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE);
+    `,
+
+    // Watch
+    watch: (date = new Date(), rif = new Date()) => `
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'MODIS' AS Sensor
+      FROM
+          modis_etna_nrt
+      WHERE
+          VRP > 100
+          AND VRP <= 500
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'VIIRS' AS Sensor
+      FROM
+          viirs_etna_nrt
+      WHERE
+          VRP > 100
+          AND VRP <= 500
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'SLSTR' AS Sensor
+      FROM
+          slstr_etna_nrt
+      WHERE
+          VRP > 100
+          AND VRP <= 500
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE);
+    `,
+
+    // Advisory
+    advisory: (date = new Date(), rif = new Date()) => `
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'MODIS' AS Sensor
+      FROM
+          modis_etna_nrt
+      WHERE
+          VRP > 500
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS close,
+          'VIIRS' AS Sensor
+      FROM
+          viirs_etna_nrt
+      WHERE
+          VRP > 500
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          COALESCE(VRP, 0) AS Sensor,
+          'SLSTR' AS Sensor
+      FROM
+          slstr_etna_nrt
+      WHERE
+          VRP > 500
+          AND Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE);
+    `,
+
+    // Class (FLAG2): Detecting Phenomena and Tracking
+
+    // Example: Requires a 'volcanic_clouds' table (Illustrative)
+    volcanicCloudsTracking: (date = new Date(), rif = new Date()) => `
+      SELECT
+          vc.\`Data (dd/mm/yy hh:mm)\` AS Date as date,
+          vc.\`Ash (km2)\` AS ASH_Total,
+          vc.\`SO2 (km2)\` AS SO2,
+          vc.\`Mix (km2)\` AS Mix,
+          vc.\`Cumulative Area (km2)\` AS Cumulative_Area,
+          COALESCE(m.VRP, 0) AS VRP_MODIS,
+          COALESCE(v.VRP, 0) AS VRP_VIIRS,
+          COALESCE(s.VRP, 0) AS VRP_SLSTR
+      FROM
+          volcaniccloud vc
+      LEFT JOIN
+          modis_etna_nrt m ON vc.\`Data (dd/mm/yy hh:mm)\` = m.Date
+          AND m.Date <= cast('${formatDate(rif)}' as DATE) 
+          AND m.Date >=  cast('${formatDate(date)}' as DATE)
+      LEFT JOIN
+          viirs_etna_nrt v ON vc.\`Data (dd/mm/yy hh:mm)\` = v.Date
+          AND v.Date <= cast('${formatDate(rif)}' as DATE) 
+          AND v.Date >=  cast('${formatDate(date)}' as DATE)
+      LEFT JOIN
+          slstr_etna_nrt s ON vc.\`Data (dd/mm/yy hh:mm)\` = s.Date
+          AND s.Date <= cast('${formatDate(rif)}' as DATE) 
+          AND s.Date >=  cast('${formatDate(date)}' as DATE);
+    `,
+
+    // Class (FLAG3): Eruption Classification
+
+    // Example: Requires an 'eruptions' table (Illustrative)
+    eruptionClassification: (date = new Date(), rif = new Date()) => `
+      SELECT
+          Date as date,
+          CASE
+              WHEN COALESCE(VRP, 0) > 1000 THEN 'Paroxysm'  -- Hypothetical threshold
+              WHEN COALESCE(VRP, 0) > 500 THEN 'Major/Strombolian' -- Hypothetical threshold
+              ELSE 'Effusive'  -- Hypothetical default
+          END AS eruption_type,
+          COALESCE(VRP, 0) AS VRP_MODIS,
+          COALESCE(VRP, 0) AS VRP_VIIRS,
+          COALESCE(VRP, 0) AS VRP_SLSTR
+      FROM
+          modis_etna_nrt
+      WHERE
+          Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          CASE
+              WHEN COALESCE(VRP, 0) > 1000 THEN 'Paroxysm'
+              WHEN COALESCE(VRP, 0) > 500 THEN 'Major/Strombolian'
+              ELSE 'Effusive'
+          END,
+          COALESCE(VRP, 0) AS VRP_MODIS,
+          COALESCE(VRP, 0) AS VRP_VIIRS,
+          COALESCE(VRP, 0) AS VRP_SLSTR
+      FROM
+          viirs_etna_nrt
+      WHERE
+          Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE)
+      UNION ALL
+      SELECT
+          Date as date,
+          CASE
+              WHEN COALESCE(VRP, 0) > 1000 THEN 'Paroxysm'
+              WHEN COALESCE(VRP, 0) > 500 THEN 'Major/Strombolian'
+              ELSE 'Effusive'
+          END,
+          COALESCE(VRP, 0) AS VRP_MODIS,
+          COALESCE(VRP, 0) AS VRP_VIIRS,
+          COALESCE(VRP, 0) AS VRP_SLSTR
+      FROM
+          slstr_etna_nrt
+      WHERE
+          Date <= cast('${formatDate(rif)}' as DATE) 
+          AND Date >=  cast('${formatDate(date)}' as DATE);
+    `,
+  };
+
+  // Execute the query based on searchParam
+  let queryToExecute = queries[searchParam];
+  if (!queryToExecute) {
+    throw new Error(`Invalid search parameter: ${searchParam}`);
+  }
+
+  const data: any[] = await mysql.query(queryToExecute(date, rif));
+  console.log(data.length, queryToExecute(date, rif))
+  return data;
+}
+
 
 // Export the MySQL adapter class for direct usage if needed
 export { MySQLAdapter };
