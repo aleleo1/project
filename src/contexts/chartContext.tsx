@@ -1,8 +1,6 @@
-import { batch, createContext, createEffect, createMemo, createSignal, on, useContext, } from "solid-js";
+import { createContext, createMemo, useContext, } from "solid-js";
 import type { Context } from "../interfaces";
 import { utcMonth, scaleUtc, scaleLinear, max } from "d3";
-import { DEFAULT_INITIAL_STATE } from "../constants";
-import { searchParamsToObject } from "../utils";
 import { useAttention } from "./attentionContext";
 import { useData } from "./dataContext";
 
@@ -11,29 +9,23 @@ const ChartContext = createContext<Context>();
 
 export function ChartProvider(props: any) {
     const [dataS] = useData()!.data!['data']
-    const refetch = useData()!.signals!['refetch']
     const margin = { top: 30, right: 50, bottom: 120, left: 100 };
     const height = 350 - margin.top - margin.bottom;
     const [isFullView,] = useAttention()!.signals!['fullView']
-    const numOfLoads = createSignal(1)
-    createEffect(on(refetch[0], () => {
-        numOfLoads[1](numOfLoads[0]() + 1)
-    }, { defer: true }))
+
     //ASSE X
-    const defaultWidth = 800
-    // Memoize date calculations to avoid repeated conversions
+    const defaultWidth = 1000
     const getFirstDate = createMemo(() => {
-        const data = batch(() => searchParamsToObject(refetch[0](), DEFAULT_INITIAL_STATE).date)
-        return data
+        const data = dataS();
+        return new Date(data![0].date)
     });
 
 
     const getLastDate = createMemo(() => {
         const data = dataS();
-        return data && data.length > 0 ? new Date(data[data.length - 1].date) : new Date();
+        return new Date(data![data!.length - 1].date)
     });
 
-    // Prevent unnecessary recalculations with proper dependency tracking
     const middleX = createMemo(() => {
         const firstDate = getFirstDate();
         const lastDate = getLastDate();
@@ -66,9 +58,10 @@ export function ChartProvider(props: any) {
         return scaleUtc([firstDate, lastDate], rangeValue);
     });
 
-    const getXTicks = createMemo(() => Array.from({ length: (10) }, (_, i) =>
-        new Date(new Date().getTime() + (i / (10)) * (getLastDate().getTime() - new Date().getTime()))
-    ))
+    const getXTicks = createMemo(() =>
+        Array.from({ length: (10) }, (_, i) =>
+            new Date(new Date().getTime() + (i / (10)) * (getLastDate().getTime() - new Date().getTime())))
+    )
 
     //ASSE Y
     const yScale = scaleLinear()
@@ -77,16 +70,12 @@ export function ChartProvider(props: any) {
     const y = createMemo(() => yScale.domain([0, max(dataS()!, d => d.close)! ?? 1]))
     const containerClass = createMemo(() => isFullView() ? `w-[${defaultWidth}px]` : 'w-full md:w-96 lg:w-[960px]')
     const provider = {
-        accessors: { divWidth, y, containerClass, getXTicks, x, fullWidth }, signals: { numOfLoads }, constants: { margin, height }
+        accessors: { divWidth, y, containerClass, getXTicks, x, fullWidth }, constants: { margin, height }
     }
     return (
-
         <ChartContext.Provider value={provider}>
-
             {props.children}
-
         </ChartContext.Provider>
-
     );
 }
 

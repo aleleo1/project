@@ -1,12 +1,11 @@
-import { createContext, createEffect, createResource, createSignal, on, onMount, useContext } from "solid-js";
-import type { Context, Data } from "../interfaces";
+import { createContext, createEffect, createResource, on, onMount, useContext } from "solid-js";
+import type { Context, Data, QueryParams } from "../interfaces";
 import { createQuerySignal, extractStates, formatDate, searchParamsToObject, updateMainURL } from "../utils";
-import { DEFAULT_INITIAL_STATE } from "../constants";
+import { Actions, DEFAULT_INITIAL_STATE } from "../constants";
 const DataContext = createContext<Context>();
 
 export function DataProvider(props: any) {
 
-    //history.pushState({}, '', )
     const refetch = createQuerySignal(props.url);
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -14,9 +13,10 @@ export function DataProvider(props: any) {
     const data = createResource<Data[]>(refetch.at(2), () => props.data, { initialValue: props.data, deferStream: false })
     onMount(() => {
         window.addEventListener('popstate', () => {
-            if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date)
+            if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date) {
                 console.log('RELOADING')
-            window.location.reload()
+                window.location.reload()
+            }
         })
 
     })
@@ -42,7 +42,8 @@ export function DataProvider(props: any) {
             // @ts-ignore
             refetch.at(3)!(false)
         } else {
-            data[1].mutate((prev) => [...prev, ...d]);
+            const action = searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).action
+            data[1].mutate((prev) => action === Actions.partial ? [...prev, ...d] : [...d]);
         }
         console.log(`fetched ${d.length} elements, new data length of ${data[0]().length}`)
         history.pushState([], '', updateMainURL(window.location.href, refetch.at(0)!(), props.index))
@@ -67,7 +68,23 @@ export function DataProvider(props: any) {
         d.setMonth(d.getMonth() - 6)
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        refetch[1]({ q: q, date: formatDate(d), action: 'partial' })
+        refetch[1]({ q: q, date: formatDate(d), action: Actions.partial })
+    }
+
+    function loadNewDataWithDate(prop: keyof QueryParams, value: Date | undefined) {
+        if (value) {
+            const state: Partial<QueryParams> = {
+                [prop]: value,
+                action: Actions.full,
+            }
+            /* if (prop === 'date') {
+                state.rif = searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date
+            } */
+            console.log(state)
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            refetch[1](state)
+        }
     }
 
 
@@ -75,15 +92,13 @@ export function DataProvider(props: any) {
 
 
 
-    const provider = { signals: { refetch }, data: { data }, functions: { loadNewDataWithScroll, loadNewData } }
+    const provider = { signals: { refetch }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate } }
 
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         <DataContext.Provider value={provider}>
-
             {props.children}
-
         </DataContext.Provider>
 
     );

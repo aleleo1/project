@@ -3,6 +3,7 @@ import type { AstroIntegration, AstroConfig } from 'astro';
 import mysql from 'mysql2/promise';
 import { formatDate } from '../utils';
 import { loadEnv } from "vite";
+import { Actions } from '../constants';
 
 const { MYSQL_HOST,
   MYSQL_USER,
@@ -72,6 +73,7 @@ class MySQLAdapter {
 
     try {
       const [results] = await this.pool!.execute<any>(sql, params);
+      await this.close();
       return results;
     } catch (error) {
       console.error('MySQL query execution error:', error);
@@ -84,6 +86,7 @@ class MySQLAdapter {
     if (this.pool) {
       await this.pool.end();
       this.pool = null;
+      console.log('connection closed!')
     }
   }
 }
@@ -148,8 +151,8 @@ export async function query_full(
   action: string
 ): Promise<Data[]> {
   const mysql = new MySQLAdapter();
-  const partial = action === 'partial'
-  const full = action === 'f'
+  const partial = action === Actions.partial
+  const full = action === Actions.full
   // Helper function to calculate month difference
   let rif = new Date()
   // Adjust 'rif' date if needed
@@ -159,7 +162,6 @@ export async function query_full(
   } else if (full) {
     rif = start
   }
-
   // Define queries object
   const queries: { [key: string]: (date?: Date, rif?: Date) => string } = {
     // Class (FLAG1): Assessing the Thermal Activity Level
@@ -374,6 +376,7 @@ export async function query_full(
   if (!queryToExecute) {
     throw new Error(`Invalid search parameter: ${searchParam}`);
   }
+  console.log(`loading from ${formatDate(rif)} to ${formatDate(date)} with query: ${queries[searchParam](date, rif)}`)
 
   const data: any[] = await mysql.query(queryToExecute(date, rif));
   return data;
