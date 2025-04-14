@@ -66,8 +66,8 @@ export function ChartProvider(props: any) {
         return scaleUtc([firstDate, lastDate], rangeValue);
     });
 
-    const getXTicks = createMemo(() => Array.from({ length: (10 /* * (!isFullView() ? numOfLoads[0]() : 1) */) }, (_, i) =>
-        new Date(new Date().getTime() + (i / (10/*  * (!isFullView() ? numOfLoads[0]() : 1) */)) * (getLastDate().getTime() - new Date().getTime()))
+    const getXTicks = createMemo(() => Array.from({ length: (10) }, (_, i) =>
+        new Date(new Date().getTime() + (i / (10)) * (getLastDate().getTime() - new Date().getTime()))
     ))
 
     //ASSE Y

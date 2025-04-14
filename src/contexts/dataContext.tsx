@@ -65,11 +65,9 @@ export function DataProvider(props: any) {
         const q = url.searchParams.get('q')
         const d = new Date(url.searchParams.get('date')!)
         d.setMonth(d.getMonth() - 6)
-        if (refetch.at(2)!()) {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            refetch[1]({ q: q, date: formatDate(d), action: 'partial' })
-        }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        refetch[1]({ q: q, date: formatDate(d), action: 'partial' })
     }
 
 

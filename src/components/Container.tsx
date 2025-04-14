@@ -4,7 +4,8 @@ import { DataProvider, useData } from "../contexts/dataContext";
 import { AttentionProvider, useAttention } from "../contexts/attentionContext";
 import type { Data, QueryParams } from "../interfaces";
 import { ChartProvider } from "../contexts/chartContext";
-function ChartContainer() {
+import ChartManager from "./ChartManager";
+function ChartContainer(p: any) {
   const data = useData()!.data!['data']
   const [isFullView, setFullView] = useAttention()!.signals!['fullView']
   const dataAttention = useAttention()!.signals!['dataAttention']
@@ -15,7 +16,10 @@ function ChartContainer() {
         <input type="checkbox" class="w-10  " onChange={(ev) => setFullView(ev.target.checked)} checked={isFullView()} />
         <Show when={!data[0].error && data[0]()!.length}>
           <ChartProvider>
-            <Chart_2></Chart_2>
+            <div class="flex flex-col">
+              <Chart_2></Chart_2>
+              <ChartManager q={p.q} index={p.index}></ChartManager>
+            </div>
           </ChartProvider>
         </Show>
       </div>
@@ -28,7 +32,7 @@ export default function Container(p: { data: Data[], initialState: QueryParams, 
     return (
       <DataProvider data={p.data} url={p.url} initialState={p.initialState} index={p.index}>
         <AttentionProvider>
-          <ChartContainer></ChartContainer>
+          <ChartContainer q={p.initialState.q} index={p.index}></ChartContainer>
         </AttentionProvider>
       </DataProvider>
     )
