@@ -77,26 +77,7 @@ export function DataProvider(props: any) {
         refetch[1]({ q: q, date: formatDate(d), action: Actions.partial })
     }
 
-    function loadNewDataWithDate(prop: keyof QueryParams, value: Date | undefined) {
-        if (value) {
-            const state: Partial<QueryParams> = {
-                [prop]: value,
-                action: Actions.full,
-            }
-            /* if (prop === 'date') {
-                state.rif = searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date
-            } */
-            console.log(state)
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            refetch[1](state)
-        }
-    }
-
-
-
-
-
+    const loadNewDataWithDate = (prop: keyof QueryParams, value: Date) => refetch[1]({ [prop]: value, action: Actions.full } as any)
 
     const provider = { signals: { refetch }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate, rif, date, dataS } }
 
