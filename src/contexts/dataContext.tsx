@@ -13,7 +13,7 @@ export function DataProvider(props: any) {
     const data = createResource<Data[]>(refetch.at(2), () => props.data, { initialValue: props.data, deferStream: false })
     onMount(() => {
         window.addEventListener('popstate', () => {
-            if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date) {
+            if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > date()) {
                 window.location.reload()
             }
         })
@@ -30,7 +30,6 @@ export function DataProvider(props: any) {
     async function fetchData() {
         console.log('fetching data...', refetch[0]())
         const fetchUrl = new URL(refetch[0]())
-        console.log(fetchUrl)
         fetchUrl.pathname = '/api/data'
         const response = await fetch(fetchUrl, {
             method: 'GET',

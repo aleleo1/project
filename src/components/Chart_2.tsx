@@ -1,4 +1,4 @@
-import { For, onMount, batch } from "solid-js";
+import { For, batch } from "solid-js";
 import { useData } from "../contexts/dataContext";
 import { formatDate } from "../utils";
 import { useAttention } from "../contexts/attentionContext";
@@ -14,7 +14,6 @@ export default function Chart_2() {
   const refetch = useData()!.signals!['refetch']
 
   const dataS = useData()!.functions!['dataS']
-  onMount(() => console.log(dataS()))
 
   return (
     <div class={`p-10 ${containerClass()}`}>

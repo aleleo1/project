@@ -376,7 +376,6 @@ export async function query_full(
   if (!queryToExecute) {
     throw new Error(`Invalid search parameter: ${searchParam}`);
   }
-  console.log(`loading from ${formatDate(rif)} to ${formatDate(date)} with query: ${queries[searchParam](date, rif)}`)
 
   const data: any[] = await mysql.query(queryToExecute(date, rif));
   return data;
