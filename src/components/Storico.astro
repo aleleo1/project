@@ -9,14 +9,19 @@ import {
   extractStates,
   updateMainURL,
 } from "../utils";
-const mainUrl = new URL(Astro.request.url);
+
+interface Props {
+  mainUrl: URL,
+  rt: boolean
+}
+const mainUrl = Astro.props.mainUrl
 const params = mainUrl.searchParams;
 const containers: Array<ContainerData> = [];
 
 let c = params.get("c");
 let state: string[] = [];
 let initialUrl = mainUrl.origin;
-
+const rt = Astro.props.rt
 if (!c) {
   const defaultState = { ...DEFAULT_INITIAL_STATE };
   defaultState.q = Queries.default;
@@ -37,7 +42,7 @@ if (!c) {
   eruptionClassificationState.q = Queries.eruptionClassification;
 
   state = [
-    updateUrl(mainUrl.origin, defaultState).toString(),
+    //updateUrl(mainUrl.origin, defaultState).toString(),
     updateUrl(mainUrl.origin, normalState).toString(),
     updateUrl(mainUrl.origin, watchState).toString(),
     updateUrl(mainUrl.origin, advisoryState).toString(),
@@ -48,7 +53,7 @@ if (!c) {
 } else {
   state = extractStates(params);
 }
-for (let i = 0; i < state.length; i++) {
+for (let i = 0; i < (!rt ? state.length : 1); i++) {
   const s = searchParamsToObject(
     new URL(state[i]).searchParams.toString(),
     DEFAULT_INITIAL_STATE,
@@ -76,9 +81,10 @@ for (let i = 0; i < state.length; i++) {
     document.getElementById("tmpUrl").getAttribute("data-value"),
   );
 </script>
-
+<div class="flex flex-col justify-center align-middle gap-y-2.5">
 {
   containers.map(({ result, state }, index) => (
+    <h1 class="text-center">{state.q}</h1>
     <Container
       data={result}
       initialState={state}
@@ -88,6 +94,7 @@ for (let i = 0; i < state.length; i++) {
     />
   ))
 }
+</div>
 <style is:global>
   .invisible-clickable {
     fill: transparent;
