@@ -13,14 +13,8 @@ export default function Chart_2() {
   const { margin, height } = useChart()!.constants as any
   const refetch = useData()!.signals!['refetch']
 
-  const [dataS] = useData()!.data!['data']
-
-  onMount(() => {
-    const parent = container!.parentElement
-    if (Array.from(parent.children).every((c: any) => !['load'].includes(c.id as string))) {
-    }
-  })
-
+  const dataS = useData()!.functions!['dataS']
+  onMount(() => console.log(dataS()))
 
   return (
     <div class={`p-10 ${containerClass()}`}>

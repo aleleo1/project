@@ -1,4 +1,4 @@
-import { createContext, createEffect, createResource, on, onMount, useContext } from "solid-js";
+import { createContext, createEffect, createMemo, createResource, on, onMount, useContext } from "solid-js";
 import type { Context, Data, QueryParams } from "../interfaces";
 import { createQuerySignal, extractStates, formatDate, searchParamsToObject, updateMainURL } from "../utils";
 import { Actions, DEFAULT_INITIAL_STATE } from "../constants";
@@ -14,12 +14,18 @@ export function DataProvider(props: any) {
     onMount(() => {
         window.addEventListener('popstate', () => {
             if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date) {
-                console.log('RELOADING')
                 window.location.reload()
             }
         })
 
     })
+
+    const rif = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).rif)
+    const date = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date)
+    const dataS = createMemo(() =>
+        data[0]().filter(d => new Date(d.date) <= new Date(rif()) && new Date(d.date) >= new Date(date()))
+    )
+
     createEffect(on(refetch[0], fetchData, { defer: true }))
     async function fetchData() {
         console.log('fetching data...', refetch[0]())
@@ -92,7 +98,7 @@ export function DataProvider(props: any) {
 
 
 
-    const provider = { signals: { refetch }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate } }
+    const provider = { signals: { refetch }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate, rif, date, dataS } }
 
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
