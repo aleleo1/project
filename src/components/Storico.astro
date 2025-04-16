@@ -8,20 +8,18 @@ import {
   searchParamsToObject,
   extractStates,
   updateMainURL,
+  updateMainUrlRt
 } from "../utils";
+import Layout from "../layouts/Layout.astro";
+const mainUrl = new URL(Astro.request.url);
 
-interface Props {
-  mainUrl: URL,
-  rt: boolean
-}
-const mainUrl = Astro.props.mainUrl
+let rt = -1;
 const params = mainUrl.searchParams;
 const containers: Array<ContainerData> = [];
-
+console.log('RT: ', Astro.params.rt)
 let c = params.get("c");
 let state: string[] = [];
 let initialUrl = mainUrl.origin;
-const rt = Astro.props.rt
 if (!c) {
   const defaultState = { ...DEFAULT_INITIAL_STATE };
   defaultState.q = Queries.default;
@@ -50,10 +48,12 @@ if (!c) {
     //updateUrl(mainUrl.origin, volcanicCloudsTrackingState).toString(),
     //updateUrl(mainUrl.origin, eruptionClassificationState).toString(),
   ];
+
 } else {
-  state = extractStates(params);
+  rt = mainUrl.searchParams.get("rt") ? Number(mainUrl.searchParams.get("rt")) : -1
+  state = rt >= 0 ? [extractStates(params)[rt]] : extractStates(params);
 }
-for (let i = 0; i < (!rt ? state.length : 1); i++) {
+for (let i = 0; i <  state.length; i++) {
   const s = searchParamsToObject(
     new URL(state[i]).searchParams.toString(),
     DEFAULT_INITIAL_STATE,
@@ -68,7 +68,10 @@ for (let i = 0; i < (!rt ? state.length : 1); i++) {
     i,
   );
 }
+initialUrl = updateMainUrlRt(initialUrl, rt)
+
 ---
+<Layout>
 
 <span
   id="tmpUrl"
@@ -95,6 +98,7 @@ for (let i = 0; i < (!rt ? state.length : 1); i++) {
   ))
 }
 </div>
+</Layout>
 <style is:global>
   .invisible-clickable {
     fill: transparent;

@@ -1,6 +1,6 @@
-import { createContext, createEffect, createMemo, createResource, on, onMount, useContext } from "solid-js";
+import { createContext, createEffect, createMemo, createResource, createSignal, on, onMount, useContext } from "solid-js";
 import type { Context, Data, QueryParams } from "../interfaces";
-import { createQuerySignal, extractStates, formatDate, searchParamsToObject, updateMainURL } from "../utils";
+import { createQuerySignal, extractStates, formatDate, isRtState, pushUrl, searchParamsToObject, updateMainURL } from "../utils";
 import { Actions, DEFAULT_INITIAL_STATE } from "../constants";
 const DataContext = createContext<Context>();
 
@@ -12,14 +12,22 @@ export function DataProvider(props: any) {
     // @ts-ignore
     const data = createResource<Data[]>(refetch.at(2), () => props.data, { initialValue: props.data, deferStream: false })
     onMount(() => {
+
         window.addEventListener('popstate', () => {
+            /* 
+            console.log('container ', props.index, ' rt: ', isRt())
             if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > date()) {
                 window.location.reload()
-            }
+            } */
+
+            setHref(window.location.href)
         })
 
     })
-
+    const href = createSignal(window.location.href)
+    const [gHref, setHref] = href
+    createEffect(on(href[0], () => window.document.title = isRt() ? "Real Time" : "Storico"))
+    const isRt = createMemo(() => isRtState(gHref(), props.index))
     const rif = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).rif)
     const date = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date)
     const dataS = createMemo(() =>
@@ -51,7 +59,7 @@ export function DataProvider(props: any) {
             data[1].mutate((prev) => action === Actions.partial ? [...prev, ...d] : [...d]);
         }
         console.log(`fetched ${d.length} elements, new data length of ${data[0]().length}`)
-        history.pushState([], '', updateMainURL(window.location.href, refetch.at(0)!(), props.index))
+        pushUrl(updateMainURL(gHref(), refetch.at(0)!(), props.index))
 
     }
 
@@ -78,7 +86,7 @@ export function DataProvider(props: any) {
 
     const loadNewDataWithDate = (prop: keyof QueryParams, value: Date) => refetch[1]({ [prop]: value, action: Actions.full } as any)
 
-    const provider = { signals: { refetch }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate, rif, date, dataS } }
+    const provider = { signals: { refetch, href }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate, rif, date, dataS, isRt } }
 
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

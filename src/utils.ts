@@ -89,3 +89,25 @@ export function updateMainURL(main: string, partial: string, index: number) {
   return mainURL.toString()
 }
 
+export function updateMainUrlRt(main: string, index: number) {
+  const mainUrl = new URL(main)
+  mainUrl.searchParams.set('rt', String(index))
+  return mainUrl.toString();
+}
+
+export function isRtState(main: string, index: number) {
+  const rt = getRt(main)
+  return !!(Number(rt) >= 0 && Number(rt) === index)
+}
+
+export function getRt(main: string) {
+  const mainUrl = new URL(main)
+  const rtParam = mainUrl.searchParams.get('rt')
+  const rt = rtParam ? Number(rtParam) : -1
+  return rt
+} 
+
+export const pushUrl = (href: string) => {
+  history.pushState({}, '', href);
+  window.dispatchEvent(new Event('popstate'));
+};

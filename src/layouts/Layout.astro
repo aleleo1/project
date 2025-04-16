@@ -1,9 +1,5 @@
 ---
 import '../styles/app.css';
-interface Props {
-	title: string
-}
-const { title } = Astro.props;
 ---
 
 <!doctype html>
@@ -14,7 +10,7 @@ const { title } = Astro.props;
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		
-		<title>INGV - {title ?? ''}</title>
+		<title></title>
 	</head>
 	<body>
 		<slot />
