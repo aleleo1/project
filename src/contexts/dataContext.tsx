@@ -17,11 +17,9 @@ export function DataProvider(props: any) {
         window.addEventListener('popstate', () => {
             setHref(window.location.href)
 
-            console.log('container ', props.index, ' rt: ', isRt())
             if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > date()) {
                 window.location.reload()
             }
-            console.log(extractStates(new URL(gHref()).searchParams).length, isRt())
 
             if (extractStates(new URL(gHref()).searchParams).length === 1 && !isRt()) {
                 window.location.href = new URL(gHref()).origin
