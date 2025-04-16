@@ -16,7 +16,6 @@ const mainUrl = new URL(Astro.request.url);
 let rt = -1;
 const params = mainUrl.searchParams;
 const containers: Array<ContainerData> = [];
-console.log('RT: ', Astro.params.rt)
 let c = params.get("c");
 let state: string[] = [];
 let initialUrl = mainUrl.origin;
@@ -53,6 +52,7 @@ if (!c) {
   rt = mainUrl.searchParams.get("rt") ? Number(mainUrl.searchParams.get("rt")) : -1
   state = rt >= 0 ? [extractStates(params)[rt]] : extractStates(params);
 }
+console.log(state)
 for (let i = 0; i <  state.length; i++) {
   const s = searchParamsToObject(
     new URL(state[i]).searchParams.toString(),
@@ -67,6 +67,9 @@ for (let i = 0; i <  state.length; i++) {
     updateUrl(mainUrl.origin, s).toString(),
     i,
   );
+}
+if (rt > 0 && containers.length === 1) {
+  rt = 0
 }
 initialUrl = updateMainUrlRt(initialUrl, rt)
 

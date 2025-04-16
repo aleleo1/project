@@ -3,6 +3,7 @@ import type { Context } from "../interfaces";
 import { utcMonth, scaleUtc, scaleLinear, max } from "d3";
 import { useAttention } from "./attentionContext";
 import { useData } from "./dataContext";
+import { get_DEFAULT_DATES } from "../utils";
 
 
 const ChartContext = createContext<Context>();
@@ -12,12 +13,20 @@ export function ChartProvider(props: any) {
     const margin = { top: 30, right: 50, bottom: 120, left: 100 };
     const height = 350 - margin.top - margin.bottom;
     const [isFullView,] = useAttention()!.signals!['fullView']
+    const isRt = useData()!.functions!['isRt']
 
     //ASSE X
     const defaultWidth = 1000
     const getFirstDate = createMemo(() => {
-        const data = dataS();
-        return new Date(data![0].date)
+        if (!isRt()) {
+            const date = new Date(dataS()![0].date) > new Date(get_DEFAULT_DATES()[0]) ? new Date(dataS()![0].date) : new Date(get_DEFAULT_DATES()[0])
+            return date
+        } else {
+            const data = dataS();
+            const date = new Date(data![0].date)
+            date.setMonth(date.getMonth() + 1)
+            return new Date(date)
+        }
     });
 
 
@@ -52,15 +61,17 @@ export function ChartProvider(props: any) {
     });
 
     const x = createMemo(() => {
-        const firstDate = new Date();
+        const firstDate = getFirstDate()
         const lastDate = getLastDate();
         const rangeValue = range();
         return scaleUtc([firstDate, lastDate], rangeValue);
     });
 
-    const getXTicks = createMemo(() =>
-        Array.from({ length: (10) }, (_, i) =>
-            new Date(new Date().getTime() + (i / (10)) * (getLastDate().getTime() - new Date().getTime())))
+    const getXTicks = createMemo(() => {
+        const start = getFirstDate()
+        return Array.from({ length: (10) }, (_, i) =>
+            new Date(start.getTime() + (i / (10)) * (getLastDate().getTime() - start.getTime())))
+    }
     )
 
     //ASSE Y

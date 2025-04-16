@@ -1,4 +1,4 @@
-import { For, batch } from "solid-js";
+import { For, Show, batch } from "solid-js";
 import { useData } from "../contexts/dataContext";
 import { formatDate } from "../utils";
 import { useAttention } from "../contexts/attentionContext";
@@ -7,7 +7,7 @@ import { useChart } from "../contexts/chartContext";
 export default function Chart_2() {
   let chartContainer: SVGSVGElement | undefined;
   let container;
-  const { loadNewData, loadNewDataWithScroll } = useData()!.functions as any
+  const { loadNewData, loadNewDataWithScroll, isRt } = useData()!.functions as any
   const da = useAttention()!.signals!['dataAttention']
   const { divWidth, y, containerClass, getXTicks, x, fullWidth } = useChart()!.accessors as any
   const { margin, height } = useChart()!.constants as any
@@ -19,11 +19,13 @@ export default function Chart_2() {
     <div class={`p-10 ${containerClass()}`}>
       <div ref={container} style={{ 'width': `${divWidth()}`, height: '350px', 'overflow-x': 'auto', "overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px' }} onscroll={loadNewDataWithScroll}>
         <svg ref={chartContainer} style={{ display: 'block' }} width={fullWidth()} height="350" viewBox={`0 0 ${fullWidth()} 350`}>
-          <rect class="invisible-clickable" x={fullWidth() - 200} y="0" width="200" height="350" onClick={loadNewData} />
-          <g class="tooltip" >
-            <rect class="toolti p-bg" x={fullWidth() - 104} y="0" width="95" height="25" />
-            <text class="tooltip-text" x={fullWidth() - 100} y="16">{refetch.at(2)!() ? 'Load more data' : 'No more data'}</text>
-          </g>
+          <Show when={!isRt()}>
+            <rect class="invisible-clickable" x={fullWidth() - 200} y="0" width="200" height="350" onClick={loadNewData} />
+            <g class="tooltip" >
+              <rect class="toolti p-bg" x={fullWidth() - 104} y="0" width="95" height="25" />
+              <text class="tooltip-text" x={fullWidth() - 100} y="16">{refetch.at(2)!() ? 'Load more data' : 'No more data'}</text>
+            </g>
+          </Show>
           <g transform={`translate(${margin.left},${margin.top})`}>
             {/* X-axis */}
             <g transform={`translate(0,${height})`} fill="none" font-size="10" font-family="sans-serif"
