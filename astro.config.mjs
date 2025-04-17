@@ -6,7 +6,10 @@ import createMySQLAdapter from './src/db/mysql-adapter';
 import node from '@astrojs/node';
 export default defineConfig({
   output: 'server',
-
+  server: {
+    host: '0.0.0.0',  // This is crucial
+    port: 4321
+  },
   vite: {
     plugins: [tailwindcss()]
   },
