@@ -16,7 +16,7 @@ export function ChartProvider(props: any) {
     const isRt = useData()!.functions!['isRt']
 
     //ASSE X
-    const defaultWidth = 1000
+    const defaultWidth =  window.innerWidth *( window.innerWidth >= 640 ? 2 / 3 : 0.7)
     const getFirstDate = createMemo(() => {
         if (!isRt()) {
             const date = new Date(dataS()![0].date) > new Date(get_DEFAULT_DATES()[0]) ? new Date(dataS()![0].date) : new Date(get_DEFAULT_DATES()[0])

@@ -1,21 +1,20 @@
 import { Show } from "solid-js";
 import Chart_2 from "./Chart_2";
 import { DataProvider, useData } from "../contexts/dataContext";
-import { AttentionProvider, useAttention } from "../contexts/attentionContext";
+import { AttentionProvider } from "../contexts/attentionContext";
 import type { Data, QueryParams } from "../interfaces";
 import { ChartProvider } from "../contexts/chartContext";
 import ChartManager from "./ChartManager";
 import { getRt, isRtState } from "../utils";
 function ChartContainer(p: any) {
   const data = useData()!.data!['data']
-  const { dataAttention } = useAttention()!.signals!
   const href = useData()!.signals!['href']
   const isRt = useData()!.functions!['isRt']
   return (
     <Show when={isRt() || getRt(href[0]()) < 0}>
       <div class="flex flex-col">
-        <div class="flex flex-row gap-28 items-center justify-center w-full overflow-hidden">
-          <img class="w-64 h-64" alt="no img" />
+        <div class="flex sm:flex-row flex-col gap-28 items-center justify-between w-full overflow-hidden m-3 p-3">
+          <img class="min-w-64 min-h-64" alt="no img" />
           <Show when={!data[0].error && data[0]()!.length}>
             <ChartProvider>
               <div class="flex flex-col">
@@ -25,7 +24,6 @@ function ChartContainer(p: any) {
             </ChartProvider>
           </Show>
         </div>
-        {<p class="h-8">{dataAttention[0]() ? JSON.stringify(dataAttention[0]()) : ''}</p>}
       </div>
     </Show>
 
