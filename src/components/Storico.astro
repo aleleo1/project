@@ -8,11 +8,14 @@ import {
   searchParamsToObject,
   extractStates,
   updateMainURL,
-  updateMainUrlRt
+  updateMainUrlRt,
+  getDeviceDetails,
 } from "../utils";
 import Layout from "../layouts/Layout.astro";
 const mainUrl = new URL(Astro.request.url);
+const userAgent = Astro.request.headers.get("user-agent")!;
 
+const defaultWidth = getDeviceDetails(userAgent).isDesktop ? 1920 : 620;
 let rt = -1;
 const params = mainUrl.searchParams;
 const containers: Array<ContainerData> = [];
@@ -47,12 +50,13 @@ if (!c) {
     //updateUrl(mainUrl.origin, volcanicCloudsTrackingState).toString(),
     //updateUrl(mainUrl.origin, eruptionClassificationState).toString(),
   ];
-
 } else {
-  rt = mainUrl.searchParams.get("rt") ? Number(mainUrl.searchParams.get("rt")) : -1
-  state = rt >= 0 ? [extractStates(params)[rt]] : extractStates(params);
+  rt = mainUrl.searchParams.get("rt")
+    ? Number(mainUrl.searchParams.get("rt"))
+    : -1;
+  state = extractStates(params);
 }
-for (let i = 0; i <  state.length; i++) {
+for (let i = 0; i < state.length; i++) {
   const s = searchParamsToObject(
     new URL(state[i]).searchParams.toString(),
     DEFAULT_INITIAL_STATE,
@@ -68,38 +72,41 @@ for (let i = 0; i <  state.length; i++) {
   );
 }
 if (rt > 0 && containers.length === 1) {
-  rt = 0
+  rt = 0;
 }
-initialUrl = updateMainUrlRt(initialUrl, rt)
-
+initialUrl = updateMainUrlRt(initialUrl, rt);
 ---
-<Layout>
 
-<span
-  id="tmpUrl"
-  data-value={initialUrl}
-  class="absolute hidden z-100 top-0 left-0"></span>
-<script lang="javascript">
-  window.history.pushState(
-    {},
-    "",
-    document.getElementById("tmpUrl").getAttribute("data-value"),
-  );
-</script>
-<div class="flex flex-col justify-center align-middle gap-y-2.5">
-{
-  containers.map(({ result, state }, index) => (
-    <h1 class="text-center">{state.q}</h1>
-    <Container
-      data={result}
-      initialState={state}
-      url={updateUrl(mainUrl.origin, state).toString()}
-      index={index}
-      client:only="solid-js"
-    />
-  ))
-}
-</div>
+<Layout>
+  <span
+    id="tmpUrl"
+    data-value={initialUrl}
+    class="absolute hidden z-100 top-0 left-0"></span>
+  <script lang="javascript">
+    window.history.pushState(
+      {},
+      "",
+      document.getElementById("tmpUrl").getAttribute("data-value"),
+    );
+  </script>
+  <div class="flex flex-col justify-center align-middle gap-y-2.5">
+    {
+      containers.map(({ result, state }, index) => (
+        <div class="h-[700px]">
+          <h1 class="text-center">{state.q}</h1>
+          <Container
+            data={result}
+            initialState={state}
+            url={updateUrl(mainUrl.origin, state).toString()}
+            index={index}
+            dw={defaultWidth}
+            tmpUrl={initialUrl}
+            client:visible
+          />
+        </div>
+      ))
+    }
+  </div>
 </Layout>
 <style is:global>
   .invisible-clickable {

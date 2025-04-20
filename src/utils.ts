@@ -109,10 +109,10 @@ export function getRt(main: string) {
   return rt
 }
 
-export const pushUrl = (href: string) => {
+/* export const pushUrl = (href: string) => {
   history.pushState({}, '', href);
   window.dispatchEvent(new Event('popstate'));
-};
+}; */
 
 interface IntervalInfo {
   callback: () => void;
@@ -132,7 +132,7 @@ interface IntervalStatus {
 /**
  * A utility to manage function execution at regular intervals
  */
-export class IntervalManager {
+class IntervalManager {
   private intervals: Record<string, IntervalInfo> = {};
   private idCounter: number = 0;
 
@@ -264,6 +264,8 @@ export class IntervalManager {
   }
 }
 
+export const intervalManager = new IntervalManager()
+
 /**
  * Generates a random date that is later than the provided date
  * @param startDate - The date to generate a random date after
@@ -321,5 +323,47 @@ export function randomizeDifferentNumber(
   }
 
   return randomValue + min;
+}
+
+
+export function getDeviceDetails(userAgent: string) {
+  // For logging/debugging
+  console.log("User-Agent:", userAgent);
+
+  const deviceInfo = {
+    isMobile:
+      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        userAgent,
+      ),
+    isTablet: /iPad|Android(?!.*Mobile)/i.test(userAgent),
+    isDesktop:
+      !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        userAgent,
+      ),
+    browser: getBrowserInfo(userAgent),
+    os: getOSInfo(userAgent),
+  };
+
+  return deviceInfo;
+}
+
+function getBrowserInfo(userAgent: string) {
+  if (userAgent.indexOf("Firefox") > -1) return "Firefox";
+  if (userAgent.indexOf("Edge") > -1) return "Edge";
+  if (userAgent.indexOf("Chrome") > -1) return "Chrome";
+  if (userAgent.indexOf("Safari") > -1) return "Safari";
+  if (userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident/") > -1)
+    return "Internet Explorer";
+  return "Unknown";
+}
+
+function getOSInfo(userAgent: string) {
+  if (userAgent.indexOf("Windows") > -1) return "Windows";
+  if (userAgent.indexOf("Mac") > -1) return "MacOS";
+  if (userAgent.indexOf("Linux") > -1) return "Linux";
+  if (userAgent.indexOf("Android") > -1) return "Android";
+  if (userAgent.indexOf("iPhone") > -1 || userAgent.indexOf("iPad") > -1)
+    return "iOS";
+  return "Unknown";
 }
 

@@ -79,7 +79,7 @@ export default function Chart_2() {
               />
             )}</For>
 
-            {/* Data Points */}
+            {/* Data Points */} 
             <For each={dataS()}>{(item, index) => (
               <circle class="data-point cursor-pointer"
                 cx={x()(new Date(item.date))}

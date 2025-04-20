@@ -1,36 +1,33 @@
 import { createContext, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, useContext } from "solid-js";
 import type { Context, Data, QueryParams } from "../interfaces";
-import { createQuerySignal, extractStates, formatDate, IntervalManager, isRtState, pushUrl, randomizeDifferentNumber, randomizeFutureDate, searchParamsToObject, updateMainURL } from "../utils";
+import { createQuerySignal, extractStates, formatDate, intervalManager, isRtState, randomizeDifferentNumber, randomizeFutureDate, searchParamsToObject, updateMainURL } from "../utils";
 import { Actions, DEFAULT_INITIAL_STATE } from "../constants";
 const DataContext = createContext<Context>();
 
 export function DataProvider(props: any) {
 
     const refetch = createQuerySignal(props.url);
-    const intervalManager = new IntervalManager();
+
+    const href = createSignal(props.initialUrl)
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const data = createResource<Data[]>(refetch.at(2), () => props.data, { initialValue: props.data, deferStream: false })
-    onMount(() => {
+    createEffect(on(href[0], (href) => {
 
-        window.addEventListener('popstate', () => {
-            setHref(window.location.href)
+        if (searchParamsToObject(new URL(extractStates(new URL(href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > date()) {
+            window.location.reload()
+        }
 
-            if (searchParamsToObject(new URL(extractStates(new URL(window.location.href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > date()) {
-                window.location.reload()
-            }
+        if (extractStates(new URL(href).searchParams).length === 1 && !isRt()) {
+            window.location.href = new URL(href).origin
+        }
 
-            if (extractStates(new URL(gHref()).searchParams).length === 1 && !isRt()) {
-                window.location.href = new URL(gHref()).origin
-            }
+        history.pushState({}, '', href);
 
-        })
+    }, { defer: true }))
 
-    })
-    const href = createSignal(window.location.href)
     const [gHref, setHref] = href
-    createEffect(on(href[0], () => window.document.title = isRt() ? "Real Time" : "Storico"))
     const isRt = createMemo(() => isRtState(gHref(), props.index))
     const rif = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).rif)
     const date = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date)
@@ -47,8 +44,6 @@ export function DataProvider(props: any) {
                     // Example usage:
                     // Generate a random future date
                     const randomFutureDate = randomizeFutureDate(prev[0].date, 5); // Random date within the next 30 days
-
-                    // Generate a random number different from 7 in the range 1-10
                     const randomDifferentNumber = randomizeDifferentNumber(prev[0].close, 1, 100);
                     console.log('running interval with value: ', { date: randomFutureDate, close: randomDifferentNumber, sensor: 'RANDOM' })
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -76,7 +71,7 @@ export function DataProvider(props: any) {
     })
     createEffect(on(refetch[0], fetchData, { defer: true }))
     async function fetchData() {
-        if (isRt()) { pushUrl(updateMainURL(gHref(), refetch.at(0)!(), props.index)); return }
+        if (isRt()) { href[1](updateMainURL(gHref(), refetch.at(0)!(), props.index)); return }
         console.log('fetching data...', refetch[0]())
         const fetchUrl = new URL(refetch[0]())
         fetchUrl.pathname = '/api/data'
@@ -100,7 +95,7 @@ export function DataProvider(props: any) {
             data[1].mutate((prev) => action === Actions.partial ? [...prev, ...d] : [...d]);
         }
         console.log(`fetched ${d.length} elements, new data length of ${data[0]().length}`)
-        pushUrl(updateMainURL(gHref(), refetch.at(0)!(), props.index))
+        href[1](updateMainURL(gHref(), refetch.at(0)!(), props.index))
 
     }
 

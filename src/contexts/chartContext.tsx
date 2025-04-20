@@ -4,6 +4,7 @@ import { utcMonth, scaleUtc, scaleLinear, max } from "d3";
 import { useAttention } from "./attentionContext";
 import { useData } from "./dataContext";
 import { get_DEFAULT_DATES } from "../utils";
+import { isServer } from "solid-js/web";
 
 
 const ChartContext = createContext<Context>();
@@ -16,7 +17,7 @@ export function ChartProvider(props: any) {
     const isRt = useData()!.functions!['isRt']
 
     //ASSE X
-    const defaultWidth =  window.innerWidth *( window.innerWidth >= 640 ? 2 / 3 : 0.7)
+    const defaultWidth = (!isServer ? window.innerWidth : props.dw) * 2 / 3
     const getFirstDate = createMemo(() => {
         if (!isRt()) {
             const date = new Date(dataS()![0].date) > new Date(get_DEFAULT_DATES()[0]) ? new Date(dataS()![0].date) : new Date(get_DEFAULT_DATES()[0])
