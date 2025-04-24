@@ -1,0 +1,40 @@
+---
+
+---
+
+<div class="flex justify-end p-4">
+    <button
+        id="downloadHtmlBtn"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+    >
+        Download
+    </button>
+    <script lang="javascript">
+        document
+            .getElementById("downloadHtmlBtn")
+            .addEventListener("click", function () {
+                // Create a URL based on the current location
+                const url = new URL(window.location.href);
+
+                // Change the pathname to your API endpoint
+                url.pathname = "/api/download";
+
+                // Keep the current query parameters
+
+                // Trigger download by creating a temporary anchor element
+                fetch(url.toString())
+                    .then((response) => response.blob())
+                    .then((blob) => {
+                        const downloadUrl = window.URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = downloadUrl;
+                        a.download = "ingv.html";
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(downloadUrl);
+                        a.remove();
+                    })
+                    .catch((error) => console.error("Download failed:", error));
+            });
+    </script>
+</div>

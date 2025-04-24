@@ -1,10 +1,11 @@
-import { For, Show, batch } from "solid-js";
+import { For, Show, batch, createUniqueId, onMount } from "solid-js";
 import { useData } from "../contexts/dataContext";
 import { formatDate } from "../utils";
 import { useAttention } from "../contexts/attentionContext";
 import { useChart } from "../contexts/chartContext";
-
+/* import { zoom, select } from 'd3' */
 export default function Chart_2() {
+  const id = createUniqueId()
   let chartContainer: SVGSVGElement | undefined;
   let container;
   const { loadNewData, loadNewDataWithScroll, isRt } = useData()!.functions as any
@@ -14,11 +15,25 @@ export default function Chart_2() {
   const refetch = useData()!.signals!['refetch']
 
   const dataS = useData()!.functions!['dataS']
+/*   onMount(() => {
+    let zoomOn = zoom()
+      .on('zoom', handleZoom);
 
+    function handleZoom(e) {
+      select(`${id}`)
+        .attr('transform', e.transform);
+    }
+
+    function initZoom() {
+      select(`${id}`)
+        .call(zoomOn);
+    }
+    initZoom()
+  }) */
   return (
     <div class={`p-10 ${containerClass()}`}>
       <div ref={container} style={{ 'width': `${divWidth()}`, height: '350px', 'overflow-x': 'auto', "overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px' }} onscroll={loadNewDataWithScroll}>
-        <svg ref={chartContainer} style={{ display: 'block' }} width={fullWidth()} height="350" viewBox={`0 0 ${fullWidth()} 350`}>
+        <svg id={id} ref={chartContainer} style={{ display: 'block' }} width={fullWidth()} height="350" viewBox={`0 0 ${fullWidth()} 350`}>
           <Show when={!isRt()}>
             <rect class="invisible-clickable" x={fullWidth() - 200} y="0" width="200" height="350" onClick={loadNewData} />
             <g class="tooltip" >
@@ -79,7 +94,7 @@ export default function Chart_2() {
               />
             )}</For>
 
-            {/* Data Points */} 
+            {/* Data Points */}
             <For each={dataS()}>{(item, index) => (
               <circle class="data-point cursor-pointer"
                 cx={x()(new Date(item.date))}

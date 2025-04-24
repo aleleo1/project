@@ -11,9 +11,9 @@ function ChartContainer(p: any) {
 
     <div class="flex flex-col">
       <div class="flex sm:flex-row flex-col gap-28 items-center justify-between w-full overflow-hidden m-3 p-3">
-        <img class="min-w-64 min-h-64" alt="no img" />
         <Show when={!data[0].error && data[0]()!.length}>
           <ChartProvider dw={p.dw}>
+            <img class="min-w-64 min-h-64" alt="no img" />
             <div class="flex flex-col">
               <Chart_2></Chart_2>
               <ChartManager q={p.q} index={p.index}></ChartManager>

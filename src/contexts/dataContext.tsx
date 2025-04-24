@@ -1,4 +1,4 @@
-import { createContext, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, useContext } from "solid-js";
+import { batch, createContext, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, useContext } from "solid-js";
 import type { Context, Data, QueryParams } from "../interfaces";
 import { createQuerySignal, extractStates, formatDate, intervalManager, isRtState, randomizeDifferentNumber, randomizeFutureDate, searchParamsToObject, updateMainURL } from "../utils";
 import { Actions, DEFAULT_INITIAL_STATE } from "../constants";
@@ -71,32 +71,33 @@ export function DataProvider(props: any) {
     })
     createEffect(on(refetch[0], fetchData, { defer: true }))
     async function fetchData() {
-        if (isRt()) { href[1](updateMainURL(gHref(), refetch.at(0)!(), props.index)); return }
-        console.log('fetching data...', refetch[0]())
-        const fetchUrl = new URL(refetch[0]())
-        fetchUrl.pathname = '/api/data'
-        const response = await fetch(fetchUrl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json'
+        batch(async () => {
+            if (isRt()) { href[1](updateMainURL(gHref(), refetch.at(0)!(), props.index)); return }
+            console.log('fetching data...', refetch[0]())
+            const fetchUrl = new URL(refetch[0]())
+            fetchUrl.pathname = '/api/data'
+            const response = await fetch(fetchUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const d = await response.json()
-        if (d.length === 0) {
-            console.log('nothing else')
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            refetch.at(3)!(false)
-        } else {
-            const action = searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).action
-            data[1].mutate((prev) => action === Actions.partial ? [...prev, ...d] : [...d]);
-        }
-        console.log(`fetched ${d.length} elements, new data length of ${data[0]().length}`)
-        href[1](updateMainURL(gHref(), refetch.at(0)!(), props.index))
-
+            const d = await response.json()
+            if (d.length === 0) {
+                console.log('nothing else')
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                refetch.at(3)!(false)
+            } else {
+                const action = searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).action
+                data[1].mutate((prev) => action === Actions.partial ? [...prev, ...d] : [...d]);
+            }
+            console.log(`fetched ${d.length} elements, new data length of ${data[0]().length}`)
+            href[1](updateMainURL(gHref(), refetch.at(0)!(), props.index))
+        })
     }
 
     function loadNewDataWithScroll(event: any) {

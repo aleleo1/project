@@ -12,9 +12,10 @@ import {
   getDeviceDetails,
 } from "../utils";
 import Layout from "../layouts/Layout.astro";
+import Download from "./Download.astro";
+
 const mainUrl = new URL(Astro.request.url);
 const userAgent = Astro.request.headers.get("user-agent")!;
-
 const defaultWidth = getDeviceDetails(userAgent).isDesktop ? 1920 : 620;
 let rt = -1;
 const params = mainUrl.searchParams;
@@ -22,6 +23,7 @@ const containers: Array<ContainerData> = [];
 let c = params.get("c");
 let state: string[] = [];
 let initialUrl = mainUrl.origin;
+
 if (!c) {
   const defaultState = { ...DEFAULT_INITIAL_STATE };
   defaultState.q = Queries.default;
@@ -89,7 +91,11 @@ initialUrl = updateMainUrlRt(initialUrl, rt);
       document.getElementById("tmpUrl").getAttribute("data-value"),
     );
   </script>
-  <div class="flex flex-col justify-center align-middle gap-y-2.5">
+  <Download />
+  <div
+    id="content-container"
+    class="flex flex-col justify-center align-middle gap-y-2.5"
+  >
     {
       containers.map(({ result, state }, index) => (
         <div class="h-[700px]">
