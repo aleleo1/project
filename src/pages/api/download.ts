@@ -6,6 +6,7 @@ export const GET: APIRoute = async ({ request }) => {
 
         const pageURL = new URL(request.url);
         const targetPageUrl = new URL('/?' + pageURL.searchParams.toString(), request.url);
+        targetPageUrl.searchParams.set('download', String(1))
         console.log(`Attempting to fetch internal page: ${targetPageUrl}`);
 
         // Make an internal server-side fetch request to the page endpoint.

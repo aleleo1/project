@@ -123,7 +123,7 @@ export function DataProvider(props: any) {
 
     const loadNewDataWithDate = (prop: keyof QueryParams, value: Date) => refetch[1]({ [prop]: value, action: Actions.full } as any)
 
-    const provider = { signals: { refetch, href }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate, rif, date, dataS, isRt } }
+    const provider = { signals: { refetch, href }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate, rif, date, dataS, isRt }, constants: {download: !!props.download} }
 
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

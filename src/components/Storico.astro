@@ -13,7 +13,9 @@ import {
 } from "../utils";
 import Layout from "../layouts/Layout.astro";
 import Download from "./Download.astro";
-
+interface Props {
+  download: number;
+}
 const mainUrl = new URL(Astro.request.url);
 const userAgent = Astro.request.headers.get("user-agent")!;
 const defaultWidth = getDeviceDetails(userAgent).isDesktop ? 1920 : 620;
@@ -80,7 +82,8 @@ initialUrl = updateMainUrlRt(initialUrl, rt);
 ---
 
 <Layout>
-  <span
+  {!Astro.props.download && 
+  (<span
     id="tmpUrl"
     data-value={initialUrl}
     class="absolute hidden z-100 top-0 left-0"></span>
@@ -91,7 +94,7 @@ initialUrl = updateMainUrlRt(initialUrl, rt);
       document.getElementById("tmpUrl").getAttribute("data-value"),
     );
   </script>
-  <Download />
+  <Download />)}
   <div
     id="content-container"
     class="flex flex-col justify-center align-middle gap-y-2.5"
@@ -108,6 +111,7 @@ initialUrl = updateMainUrlRt(initialUrl, rt);
             dw={defaultWidth}
             tmpUrl={initialUrl}
             client:visible
+            download={Astro.props.download}
           />
         </div>
       ))
@@ -117,23 +121,24 @@ initialUrl = updateMainUrlRt(initialUrl, rt);
 <style is:global>
   .invisible-clickable {
     fill: transparent;
-    cursor: pointer;
   }
-  .tooltip {
+/*   .tooltip {
     opacity: 0;
     transition: opacity 0.3s;
   }
   .invisible-clickable:hover + .tooltip {
     opacity: 1;
-  }
+  } */
   .tooltip-bg {
     fill: #333;
     rx: 4;
     ry: 4;
+    cursor: pointer;
   }
   .tooltip-text {
     font-family: Arial, sans-serif;
     font-size: 12px;
     fill: white;
+    cursor: pointer;
   }
 </style>

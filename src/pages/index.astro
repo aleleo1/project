@@ -1,7 +1,7 @@
 ---
 import Storico from "../components/Storico.astro"
-
+const download = Number(new URL(Astro.request.url).searchParams.get('download'))
 ---
 
-	<Storico />
+	<Storico download={download} />
 

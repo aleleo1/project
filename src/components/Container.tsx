@@ -25,11 +25,11 @@ function ChartContainer(p: any) {
 
   )
 }
-export default function Container(p: { data: Data[], initialState: QueryParams, url: string, index: number, dw: number, tmpUrl: string }) {
+export default function Container(p: { data: Data[], initialState: QueryParams, url: string, index: number, dw: number, tmpUrl: string, download: number }) {
   for (let i = 0; i < (p.initialState.num ?? 1); i++) {
     return (
 
-      <DataProvider data={p.data} url={p.url} initialState={p.initialState} index={p.index} initialUrl={p.tmpUrl}>
+      <DataProvider data={p.data} url={p.url} initialState={p.initialState} index={p.index} download={p.download} initialUrl={p.tmpUrl}>
         <AttentionProvider>
           <ChartContainer q={p.initialState.q} index={p.index} dw={p.dw}></ChartContainer>
         </AttentionProvider>
