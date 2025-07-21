@@ -1,0 +1,61 @@
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\chapter{Introduzione}
+\label{chap:introduzione}
+
+\section{Introduzione}
+
+Nel panorama attuale della scienza dei dati e dell’ingegneria, la capacità di raccogliere, analizzare e visualizzare grandi quantità di dati temporali rappresenta un requisito fondamentale per numerosi settori applicativi, dal monitoraggio ambientale alla gestione di infrastrutture critiche, fino all’analisi di fenomeni naturali complessi come le eruzioni vulcaniche. Tuttavia, la crescente complessità e quantità dei dati disponibili pone sfide significative sia dal punto di vista della progettazione delle interfacce utente sia, soprattutto, dal punto di vista delle performance dei sistemi di visualizzazione e interazione.
+
+In questo contesto si colloca la presente tesi, il cui obiettivo principale è la progettazione e lo sviluppo di un’applicazione web per la visualizzazione interattiva di serie temporali di dati, massimizzando le performance in termini di reattività, scalabilità e fruibilità su diversi dispositivi. L’applicazione consente non solo l’esplorazione e il confronto di diversi stati dei dati, ma anche la loro esportazione e condivisione, funzionalità sempre più richieste in ambito scientifico e industriale.
+
+\subsection{Contesto e motivazioni}
+
+Negli ultimi anni, la digitalizzazione di strumenti di misura e sensori ha portato a una crescita esponenziale della quantità di dati raccolti in tempo reale. La necessità di disporre di strumenti efficaci per la visualizzazione e l’analisi di questi dati è diventata centrale in molteplici ambiti: ricerca scientifica, monitoraggio ambientale, controllo di processo, gestione di emergenze, e molti altri. In particolare, nel monitoraggio di fenomeni naturali come le eruzioni vulcaniche, la possibilità di accedere a dati storici, confrontarli con dati in tempo reale e navigare rapidamente tra differenti scenari rappresenta un valore aggiunto per ricercatori, tecnici e decisori.
+
+Tuttavia, la gestione e la visualizzazione di dataset di grandi dimensioni in ambito web presenta numerose criticità: i tradizionali strumenti di visualizzazione possono soffrire di lentezze, blocchi o inefficienze, soprattutto su dispositivi mobili o in presenza di connessioni lente. Inoltre, la necessità di garantire reattività e fluidità nell’interazione, senza sacrificare la qualità della rappresentazione grafica e la precisione delle analisi, impone l’adozione di soluzioni tecnologiche avanzate.
+
+\subsection{Problema e rilevanza}
+
+Il problema affrontato in questa tesi riguarda dunque la progettazione e realizzazione di un sistema che permetta la visualizzazione interattiva di serie temporali di dati ad alte prestazioni, in grado di gestire dataset di grandi dimensioni e offrire funzionalità avanzate come il confronto di scenari, la navigazione storica e l’esportazione dei risultati. La rilevanza di questo problema è duplice: da un lato, risponde a esigenze concrete di numerosi settori applicativi; dall’altro, rappresenta una sfida tecnica di non banale risoluzione, soprattutto se si considera la necessità di garantire performance elevate su una vasta gamma di dispositivi e condizioni operative.
+
+\subsection{Difficoltà e limiti delle soluzioni esistenti}
+
+Le soluzioni esistenti per la visualizzazione di dati temporali in ambito web presentano diversi limiti. Molte librerie grafiche sono pensate per dataset di dimensioni moderate e non riescono a mantenere performance accettabili quando la quantità di dati cresce. Altre soluzioni, più orientate alla scalabilità, sacrificano spesso la qualità dell’interazione utente o risultano difficili da personalizzare per esigenze specifiche, come la gestione di stati multipli o la navigazione storica. Inoltre, la maggior parte degli strumenti disponibili non integra nativamente funzionalità di esportazione personalizzata o di sincronizzazione dello stato via URL, che risultano invece essenziali in contesti collaborativi o di reporting scientifico.
+
+\subsection{Obiettivi della tesi}
+
+L’obiettivo di questa tesi è duplice: da un lato, progettare un’architettura software in grado di massimizzare le performance nella visualizzazione e nell’interazione con serie temporali di dati; dall’altro, implementare un’applicazione concreta che dimostri l’efficacia delle soluzioni adottate. In particolare, si intendono perseguire i seguenti obiettivi principali:
+\begin{itemize}
+    \item Garantire la reattività dell’interfaccia utente anche in presenza di grandi quantità di dati.
+    \item Offrire funzionalità avanzate di confronto tra differenti stati/scenari dei dati.
+    \item Permettere la navigazione storica e la condivisione dello stato dell’applicazione tramite URL.
+    \item Integrare una funzione di esportazione che consenta di salvare e condividere le visualizzazioni.
+    \item Assicurare la compatibilità e la responsività dell’applicazione su diversi dispositivi.
+\end{itemize}
+
+\subsection{Soluzione proposta e vantaggi}
+
+La soluzione proposta si basa sull’utilizzo di tecnologie web moderne e performanti: Astro per il rendering server-side, SolidJS per la gestione reattiva dello stato dell’interfaccia, e D3.js per la visualizzazione dinamica dei dati. L’adozione di questi strumenti consente di separare in modo efficiente la logica di business dalla presentazione grafica, ottimizzando così sia i tempi di caricamento sia la fluidità delle interazioni.
+
+Un aspetto centrale della soluzione è la gestione ottimizzata dello stato tramite URL: ogni configurazione dell’interfaccia e ogni filtro applicato vengono automaticamente codificati nell’indirizzo della pagina, permettendo la navigazione, la condivisione e il ripristino esatto della visualizzazione. Inoltre, l’implementazione di una funzione di esportazione consente di generare file HTML standalone che includono la visualizzazione corrente, facilitando la diffusione e la conservazione dei risultati.
+
+Dal punto di vista delle performance, sono state adottate numerose strategie di ottimizzazione, tra cui il caricamento asincrono dei dati, la virtualizzazione dei componenti grafici, e l’adozione di algoritmi efficienti per la gestione delle serie temporali. L’architettura modulare dell’applicazione consente inoltre una facile estendibilità e integrazione con nuove fonti dati o tipologie di visualizzazione.
+
+\subsection{Tecnologie e metodologie utilizzate}
+
+Le principali tecnologie adottate includono:
+\begin{itemize}
+    \item \textbf{Astro}: framework per il rendering server-side e la generazione di siti web statici e dinamici.
+    \item \textbf{SolidJS}: libreria JavaScript per la creazione di interfacce utente reattive ad alte prestazioni.
+    \item \textbf{D3.js}: libreria per la manipolazione efficiente di dati e la generazione di visualizzazioni dinamiche e interattive.
+    \item \textbf{MySQL}: sistema di gestione di database relazionali per l’archiviazione e la gestione dei dati.
+    \item \textbf{TailwindCSS}: framework CSS per la creazione di interfacce moderne e responsive.
+\end{itemize}
+
+Dal punto di vista metodologico, il progetto ha seguito un approccio iterativo e incrementale: dopo una fase iniziale di analisi dei requisiti e delle soluzioni esistenti, sono stati prototipati i principali componenti e sono state eseguite sessioni di benchmarking per valutare le performance in diversi scenari. Le ottimizzazioni sono state introdotte progressivamente, sulla base dei risultati ottenuti e dei feedback raccolti.
+
+\subsection{Risultati ottenuti}
+
+L’applicazione sviluppata ha dimostrato di poter gestire in modo efficiente dataset di grandi dimensioni, mantenendo tempi di risposta ridotti e un’eccellente fluidità dell’interazione anche su dispositivi con risorse limitate. Le strategie di ottimizzazione adottate hanno permesso di ridurre sensibilmente i tempi di caricamento e di aggiornamento delle visualizzazioni rispetto a soluzioni tradizionali. Le funzionalità di confronto tra stati, navigazione storica tramite URL e esportazione delle visualizzazioni sono state apprezzate sia da utenti tecnici sia da utenti meno esperti, confermando la validità dell’approccio scelto.
+
+In sintesi, il lavoro svolto ha fornito un contributo concreto al tema della visualizzazione performante di serie temporali di dati in ambiente web, proponendo soluzioni tecniche e architetturali replicabili in contesti affini e facilmente estendibili a nuove esigenze applicative.

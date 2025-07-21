@@ -1,0 +1,124 @@
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\chapter{Tecnologie}
+\label{chap:tecnologie}
+
+Di seguito sono descritte le sezioni che, in generale, dovrebbero comporre una tesi di laurea. La suddivisione presentata non è strettamente vincolante e dovrebbe essere adattata in base alle esigenze e alle caratteristiche della tesi trattata.
+
+\section{Tecnologie (solo DBWP)}
+
+In questo capitolo vengono descritte le principali tecnologie adottate per la realizzazione del progetto, analizzandone le caratteristiche, i vantaggi, i limiti e le motivazioni che hanno portato alla loro scelta. L’integrazione efficace di tali strumenti ha permesso di raggiungere gli obiettivi di performance, scalabilità e usabilità richiesti dal contesto applicativo.
+
+\subsection{Astro}
+
+Astro è un moderno framework per la creazione di siti web statici e dinamici, ottimizzato per il rendering lato server (SSR) e la generazione di pagine leggere. Grazie alla sua architettura “island-based”, Astro consente di caricare solo il codice strettamente necessario per ogni componente della pagina, riducendo drasticamente il payload e migliorando i tempi di caricamento. Astro supporta l’integrazione di diversi framework JavaScript (come React, SolidJS, Vue) e permette la generazione di siti sia statici che dinamici, risultando particolarmente adatto per applicazioni ad alte prestazioni.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Rendering server-side efficiente.
+    \item Ottimizzazione automatica delle risorse.
+    \item Supporto a molteplici framework UI.
+    \item Riduzione significativa del JavaScript lato client.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Ecosistema ancora giovane.
+    \item Minore disponibilità di plugin rispetto a framework più maturi.
+\end{itemize}
+
+\subsection{SolidJS}
+
+SolidJS è una libreria JavaScript per la costruzione di interfacce utente reattive, focalizzata sulla massimizzazione delle performance tramite un sistema di reattività fine-grained e la generazione di codice minimale. SolidJS non utilizza un virtual DOM, ma aggiorna il DOM reale solo dove strettamente necessario, garantendo performance superiori rispetto ad alternative più diffuse come React o Vue, soprattutto in presenza di dataset di grandi dimensioni.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Aggiornamenti estremamente rapidi e granulari.
+    \item Consumo di memoria ridotto.
+    \item Facilità di integrazione con Astro.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Comunità e documentazione in crescita ma ancora limitate.
+    \item Alcune librerie di terze parti non ancora pienamente compatibili.
+\end{itemize}
+
+\subsection{D3.js}
+
+D3.js (Data-Driven Documents) è la libreria di riferimento per la manipolazione di dati e la generazione di visualizzazioni dinamiche e interattive in ambiente web. D3 permette di mappare dati complessi su elementi grafici SVG, Canvas o HTML, abilitando la creazione di grafici altamente personalizzati e interattivi. Nel progetto è stato utilizzato per la costruzione dei grafici temporali, la gestione dello zoom e della panoramica, e l’aggiornamento dinamico delle visualizzazioni.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Estrema flessibilità e potenza espressiva.
+    \item Supporto a tutte le tipologie di dati e grafici.
+    \item Ottimizzazioni per grandi moli di dati.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Curva di apprendimento elevata.
+    \item Richiede una buona conoscenza di JavaScript e del DOM.
+\end{itemize}
+
+\subsection{MySQL}
+
+MySQL è uno dei database relazionali open source più diffusi e utilizzati al mondo. Offre elevate performance in termini di gestione delle query e scalabilità, risultando adatto sia per applicazioni di piccole dimensioni che per sistemi enterprise. Nel progetto viene utilizzato per l’archiviazione e la gestione delle serie temporali di dati, sfruttando la sua affidabilità, la facilità di integrazione e il supporto a query complesse.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Performance elevate per la gestione di dati strutturati.
+    \item Ampio supporto comunitario e documentazione completa.
+    \item Facilità di backup e replicazione.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Minor efficienza per l’analisi di dati non strutturati.
+    \item Scalabilità orizzontale limitata rispetto a soluzioni NoSQL.
+\end{itemize}
+
+\subsection{TailwindCSS}
+
+TailwindCSS è un framework CSS utility-first che consente di costruire interfacce moderne e responsive in modo rapido e modulare. Le classi utility permettono di definire direttamente nello stile degli elementi le proprietà di layout, colore, tipografia e spaziatura, semplificando la manutenzione e l’evoluzione dell’interfaccia grafica.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Rapidità di sviluppo delle interfacce.
+    \item Elevata personalizzazione e modularità.
+    \item Ottimizzazione automatica del CSS finale.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Possibile aumento della verbosità nel markup.
+    \item Richiede una fase di apprendimento per l’approccio utility-first.
+\end{itemize}
+
+\subsection{Node.js e Vite}
+
+Node.js rappresenta la piattaforma di esecuzione per il backend, mentre Vite è lo strumento di build scelto per ottimizzare i tempi di sviluppo e caricamento in ambiente locale. La combinazione di questi strumenti garantisce tempi di risposta ridotti, hot-reloading e facilità di integrazione con le moderne tecnologie frontend.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Esecuzione asincrona e non bloccante (Node.js).
+    \item Build e reload ultraveloci (Vite).
+    \item Ampia compatibilità con ecosistemi JavaScript e TypeScript.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Necessità di aggiornamenti frequenti per mantenere la sicurezza.
+    \item Dipendenza da ecosistemi open source in rapida evoluzione.
+\end{itemize}
+
+\subsection{Architettura modulare e best practice adottate}
+
+L’architettura del progetto segue principi di modularità, separazione delle responsabilità e riusabilità del codice. I principali moduli (visualizzazione, gestione dati, interfaccia utente, API, export) sono stati progettati in modo indipendente, agevolando la manutenzione e l’estendibilità futura. Sono state adottate best practice di sviluppo come la gestione centralizzata dello stato, l’utilizzo di context provider, la scrittura tipizzata in TypeScript e la documentazione del codice.
+
+\subsection{Integrazione e deploy}
+
+Il processo di integrazione e deploy è stato automatizzato tramite script di build e configurazioni dedicate, garantendo la possibilità di eseguire facilmente il progetto sia in ambiente di sviluppo che in produzione. Particolare attenzione è stata posta all’ottimizzazione delle performance tramite tecniche di code splitting, lazy loading e compressione delle risorse statiche.
+
+\subsection{Considerazioni finali sulle tecnologie}
+
+La scelta delle tecnologie descritte si è rivelata vincente per il raggiungimento degli obiettivi di progetto: reattività dell’interfaccia, efficienza nella gestione dei dati, scalabilità e facilità di manutenzione. L’integrazione di strumenti moderni e performanti ha permesso di ottenere un prodotto finale robusto, flessibile e facilmente estendibile, pronto per affrontare le sfide poste dalla crescente complessità dei dati e delle esigenze degli utenti.

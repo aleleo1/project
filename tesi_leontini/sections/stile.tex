@@ -1,0 +1,70 @@
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\chapter{Linee guida sullo stile}
+\label{chap:style}
+
+\section{Citazioni}
+
+I riferimenti alle voci bibliografiche, inseriti tramite \verb|\cite| (ad es., \cite{esempio_citazione}), sono necessari per giustificare un'affermazione inserita nella tesi. Ad esempio:
+
+\noindent\emph{Già nel 1980 Michael McCloskey e Neal J. Cohen evidenziarono che le architetture connessioniste non sono adatte ad apprendere in maniera incrementale e continua~\cite{mccloskey1989catastrophic}.}
+
+Un altro uso dei riferimenti bibliografici permette di specificare le risorse di informazioni relative all'oggetto del discorso. Ad esempio:
+
+\noindent\emph{Per la realizzazione dell'applicazione lato server è stato utilizzato PHP~\cite{php}.}
+
+Le citazioni vanno inserite prima della punteggiatura di chiusura di una frase, lasciando uno spazio dalla parola che precede. Idealmente, lo spazio dovrebbe essere un \emph{non-breaking space}, ovvero il carattere \texttt{\~}, per evitare che la citazione vada su una nuova riga: ad es., \verb|PHP~\cite{php}|. Guardate la bibliografia alla fine di questo documento per vedere come vengono esplicitati i riferimenti nei precedenti esempi. 
+Si noti che il termine ``citazione'' non richiede che venga testualmente citato un brano o un frammento di testo di una fonte esterna: potete esprimere il concetto a parole vostre, per poi aggiungere la citazione a supporto dell'affermazione.
+
+\section{Utilizzo del \emph{corsivo}}
+
+Il corsivo, realizzato tramite il comando \verb|\emph| (\textbf{non} usare \verb|\textit| per il corsivo), è da impiegare nei seguenti casi:
+\begin{itemize}
+ \item enfasi;
+ \item termini in inglese (solo la prima volta che vengono utilizzati).
+\end{itemize}
+
+\section{Utilizzo di caratteri \texttt{monospace}}
+
+L'uso del comando \verb|\texttt| per la scrittura di testo in caratteri monospace è da impiegare nei seguenti casi:
+\begin{itemize}
+ \item nomi di variabili, classi, funzioni, ecc. in linguaggio di programmazione;
+ \item nomi di file.
+\end{itemize}
+
+\section{Abbreviazioni}
+
+Tutte le abbreviazioni devono essere definite prima di essere utilizzate, presentando al lettore il termine completo con, tra parentesi, l'abbreviazione.
+
+\section{Virgolette}
+
+Le ``virgolette'' si aprono con \verb|``| (doppio backtick; guardate il sorgente del presente documento per capire meglio che carattere sia) e si chiudono con \verb|''| (due apici singoli).
+
+\section{Tabelle}
+
+\`E consigliato l'uso del package \texttt{booktabs} per la realizzazione di tabelle. La documentazione è disponibile \href{https://ctan.mirror.garr.it/mirrors/ctan/macros/latex/contrib/booktabs/booktabs.pdf}{a questo link}.
+
+Un esempio è riportato in Tab.~\ref{tab:esempio}.
+
+\begin{table}
+\centering
+\begin{tabular}{lccc}
+\toprule
+\textbf{Model} & \textbf{Precision} & \textbf{Recall} & \textbf{Parameters} \\
+\midrule
+CNN & 0.75 & 0.84 & 0.8$\times$10$^6$ \\
+RNN & 0.82 & 0.79 & 0.3$\times$10$^6$ \\
+LSTM & 0.91 & 0.80 & 0.5$\times$10$^6$ \\
+\bottomrule
+\end{tabular}
+\caption{Esempio di tabella.}
+\label{tab:esempio}
+\end{table}
+
+\section{Sintassi e lessico}
+
+Di seguito alcune regole da seguire nella stesura della tesi:
+\begin{itemize}
+ \item evitare l'uso della prima persona plurale o singolare;
+ \item evitare l'uso della virgola per unire proposizioni coordinate. Preferire il punto e virgola, una congiunzione o in alternativa riscrivere il periodo;
+ \item utilizzate correttamente e opportunamente la terminologia tecnica: ad es., non scrivete \emph{``L'utente fa il login''}, ma \emph{``L'utente effettua l'accesso''}.
+\end{itemize}

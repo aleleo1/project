@@ -1,0 +1,155 @@
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\chapter{Soluzione Proposta}
+\label{chap:soluzione_proposta}
+
+Di seguito sono descritte le sezioni che, in generale, dovrebbero comporre una tesi di laurea. La suddivisione presentata non è strettamente vincolante e dovrebbe essere adattata in base alle esigenze e alle caratteristiche della tesi trattata.
+
+\section{Soluzione proposta (solo DBWP)}
+
+In questo capitolo viene descritta in dettaglio l’architettura della soluzione proposta, con particolare attenzione ai modelli dati, ai flussi di interazione tra le componenti, alle pagine applicative, agli aspetti di sicurezza e usabilità. Verranno inoltre inseriti diagrammi e screenshot a supporto della trattazione.
+
+\subsection{Architettura generale}
+
+L’applicazione è strutturata secondo un’architettura modulare e scalabile, suddivisa in tre principali layer: frontend, backend e database. Il frontend, sviluppato in Astro e SolidJS, si occupa della presentazione, dell’interazione utente e della gestione dello stato dell’interfaccia. Il backend, realizzato tramite Node.js, funge da intermediario tra il frontend e il database MySQL, gestendo le richieste, l’autenticazione e la sicurezza. Il database MySQL archivia in modo strutturato le serie temporali e i metadati associati.
+
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/architettura_generale.png}
+    \caption{Schema architetturale della soluzione proposta}
+    \label{fig:architettura_generale}
+\end{figure}
+\vspace{0.5cm}
+
+\subsection{Modello dei dati e diagramma ER}
+
+Il database è progettato per garantire efficienza nelle query temporali e sicurezza nell’accesso ai dati. Il modello ER prevede le seguenti principali entità:
+
+\begin{itemize}
+    \item \textbf{Utente}: informazioni sugli utenti registrati, privilegi e log di accesso.
+    \item \textbf{Serie Temporale}: identificatore, descrizione, metadati (unità di misura, sorgente, ecc.).
+    \item \textbf{Dato}: timestamp, valore, riferimento alla serie temporale.
+    \item \textbf{Stato/Scenario}: configurazioni di visualizzazione e filtri applicati.
+\end{itemize}
+
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/er_diagram.png}
+    \caption{Diagramma ER del database}
+    \label{fig:er_diagram}
+\end{figure}
+\vspace{0.5cm}
+
+\subsection{Interazione tra le pagine e diagramma dei flussi}
+
+Il flusso di interazione tra le principali pagine dell’applicazione può essere rappresentato come segue:
+
+\begin{itemize}
+    \item \textbf{Home}: punto di ingresso, panoramica delle serie disponibili e accesso rapido alle funzionalità principali.
+    \item \textbf{Visualizzazione Storico}: pagina centrale per l’esplorazione, il confronto e la visualizzazione delle serie temporali.
+    \item \textbf{Download}: pagina/modale dedicata all’esportazione delle visualizzazioni.
+    \item \textbf{Gestione Stati}: per il salvataggio, caricamento e confronto di diversi scenari.
+    \item \textbf{Login/Registrazione}: gestione sicura dell’accesso utente e delle autorizzazioni.
+\end{itemize}
+
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/page_flow.png}
+    \caption{Diagramma dei flussi di navigazione tra le pagine}
+    \label{fig:page_flow}
+\end{figure}
+\vspace{0.5cm}
+
+\subsection{Descrizione delle pagine principali}
+
+\subsubsection{Home}
+
+La home page (\autoref{fig:screenshot_home}) offre una panoramica sulle serie temporali disponibili, con filtri rapidi e accesso alle ultime visualizzazioni. L’interfaccia è progettata per essere intuitiva anche per utenti non esperti.
+
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/screenshot_home.png}
+    \caption{Screenshot della home page}
+    \label{fig:screenshot_home}
+\end{figure}
+\vspace{0.5cm}
+
+\subsubsection{Visualizzazione Storico}
+
+La pagina di visualizzazione (\autoref{fig:screenshot_storico}) consente di esplorare e confrontare più serie temporali, applicare filtri, zoomare e navigare tra gli stati salvati. Il sistema di gestione dello stato tramite URL permette la condivisione e il ripristino immediato di qualsiasi configurazione.
+
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{img/screenshot_storico.png}
+    \caption{Screenshot della pagina di visualizzazione storico}
+    \label{fig:screenshot_storico}
+\end{figure}
+\vspace{0.5cm}
+
+\subsubsection{Download}
+
+L’utente può esportare la visualizzazione attuale tramite la funzione di download (\autoref{fig:screenshot_download}), che genera un file HTML standalone. Questo facilita la condivisione e la conservazione dei risultati anche offline.
+
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.7\textwidth]{img/screenshot_download.png}
+    \caption{Screenshot della funzione di download}
+    \label{fig:screenshot_download}
+\end{figure}
+\vspace{0.5cm}
+
+\subsubsection{Gestione Stati}
+
+La pagina/modale di gestione degli stati permette il salvataggio di configurazioni specifiche di filtri, intervalli temporali o visualizzazioni, che possono essere richiamate o condivise tramite URL.
+
+\subsubsection{Login/Registrazione}
+
+La sicurezza è garantita tramite un sistema di autenticazione robusto, con cifratura delle password, validazione lato server e gestione sicura delle sessioni. Le autorizzazioni consentono di limitare l’accesso a determinate funzionalità in base al ruolo utente.
+
+\subsection{Sicurezza}
+
+Sono stati adottati i seguenti accorgimenti di sicurezza:
+\begin{itemize}
+    \item Crittografia delle password utente e protezione contro SQL injection.
+    \item Validazione dei dati in ingresso su tutte le API.
+    \item Gestione sicura delle sessioni e dei token di autenticazione.
+    \item Limitazione degli accessi in base ai privilegi utente.
+\end{itemize}
+
+\subsection{Usabilità}
+
+L’usabilità è stata perseguita tramite:
+\begin{itemize}
+    \item Interfaccia responsiva, ottimizzata per desktop e mobile.
+    \item Navigazione intuitiva e accesso rapido alle funzioni principali.
+    \item Feedback visivi e messaggi di errore chiari per l’utente.
+    \item Accessibilità garantita tramite scorciatoie da tastiera e supporto a screen reader.
+\end{itemize}
+
+\subsection{Screenshot e risultati}
+
+Di seguito sono riportati alcuni screenshot rappresentativi delle funzionalità principali implementate.
+
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.48\textwidth]{img/screenshot_mobile.png}
+    \hfill
+    \includegraphics[width=0.48\textwidth]{img/screenshot_confronto.png}
+    \caption{Esempi di visualizzazione su mobile e confronto tra scenari}
+    \label{fig:screenshot_extra}
+\end{figure}
+\vspace{0.5cm}
+
+\subsection{Considerazioni finali sulla soluzione}
+
+L’architettura proposta si è dimostrata efficace nel garantire performance elevate, sicurezza e usabilità. La gestione avanzata dello stato tramite URL, l’esportazione delle visualizzazioni e la modularità del sistema permettono un uso versatile sia in ambito scientifico che industriale. Le strategie di ottimizzazione adottate hanno permesso di ottenere tempi di risposta ridotti anche su dataset di grandi dimensioni.
+
+Eventuali limiti residui riguardano la scalabilità su volumi dati estremi e l’integrazione di sorgenti dati eterogenee in tempo reale, che potranno essere affrontati in futuri sviluppi.
+
+% Inserire qui eventuali riferimenti a codice su GitHub o pubblicazioni
