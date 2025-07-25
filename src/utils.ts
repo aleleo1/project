@@ -368,3 +368,6 @@ function getOSInfo(userAgent: string) {
 }
 
 
+export function biggerNotNullDate(date1: any, date2: any) {
+  return new Date(date1) > new Date(date2) ? new Date(date1) : new Date(date2)
+}

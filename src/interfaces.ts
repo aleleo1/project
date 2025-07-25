@@ -1,5 +1,15 @@
 import type { Signal, ResourceReturn, Accessor } from "solid-js";
+import type { RectangleDrawerOptions, RectangleData } from './components/utils/RectangleDrawer';
 
+export interface SvgDrawingComponentProps {
+  enableDrawing?: boolean;
+  width?: number;
+  height?: number;
+  drawingOptions?: RectangleDrawerOptions;
+  onRectangleCreated?: (data: RectangleData) => void;
+  onRectanglesCleared?: () => void;
+  children?: any;
+}
 export interface DataPoint {
   date: Date;
   close: number;

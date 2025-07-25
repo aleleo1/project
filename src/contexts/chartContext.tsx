@@ -2,8 +2,9 @@ import { createContext, createMemo, createSignal, createUniqueId, useContext, } 
 import type { Context } from "../interfaces";
 import { scaleUtc, scaleLinear, max, zoom, select, zoomIdentity } from "d3";
 import { useData } from "./dataContext";
-import { get_DEFAULT_DATES } from "../utils";
+import { biggerNotNullDate, get_DEFAULT_DATES } from "../utils";
 import { isServer } from "solid-js/web";
+import type { RectangleData } from "../components/utils/RectangleDrawer";
 
 
 const ChartContext = createContext<Context>();
@@ -16,13 +17,14 @@ export function ChartProvider(props: any) {
     const margin = { top: 30, right: 50, bottom: 120, left: 100 };
     const height = 350 - margin.top - margin.bottom;
     const isRt = useData()!.functions!['isRt']
-    const defaultXY = `translate(${margin.left},${margin.top}) scale(1)`
     const [getN, setN] = createSignal(10)
     const [kZoom, setKZoom] = createSignal(1)
+    const [isDrawingEnabled, setIsDrawingEnabled] = createSignal(false);
+    const [zoomCounter, setZoomCounter] = createSignal(0)
     const defaultWidth = (!isServer ? window.innerWidth : props.dw) * 2 / 3
     const getFirstDate = createMemo(() => {
         if (!isRt()) {
-            const date = new Date(dataS()![0].date) > new Date(get_DEFAULT_DATES()[0]) ? new Date(dataS()![0].date) : new Date(get_DEFAULT_DATES()[0])
+            const date = biggerNotNullDate(new Date(dataS()![0].date), new Date(get_DEFAULT_DATES()[0]))
             return date
         } else {
             const data = dataS();
@@ -31,7 +33,6 @@ export function ChartProvider(props: any) {
             return new Date(date)
         }
     });
-
 
     const getLastDate = createMemo(() => {
         const data = dataS();
@@ -55,8 +56,7 @@ export function ChartProvider(props: any) {
         const start = getFirstDate()
         return Array.from({ length: (getN()) }, (_, i) =>
             new Date(start.getTime() + (i / (getN())) * (getLastDate().getTime() - start.getTime())))
-    }
-    )
+    })
 
     //ASSE Y
     const yScale = scaleLinear()
@@ -72,9 +72,9 @@ export function ChartProvider(props: any) {
 
     // Store the zoom behavior as a variable to access it later
     const myZoom = zoom<SVGGElement, unknown>()
-        .scaleExtent([0.5, 5]) // Limit zoom scale: min 0.5x, max 5x
+     /*    .scaleExtent([0.5, 5]) // Limit zoom scale: min 0.5x, max 5x
         .translateExtent([[-100, -10], [divWidth + margin.left + margin.right, height + margin.top + margin.bottom]]) // Limit the area that can be viewed
-        .on('zoom', handleZoom);
+         */.on('zoom', handleZoom);
 
 
     // Updated zoom handler
@@ -84,10 +84,6 @@ export function ChartProvider(props: any) {
         const x = e.transform.x;
         const y = e.transform.y;
         const k = e.transform.k;
-        if (k === 1) return
-
-        if (getN() > 10) setKZoom(k)
-        console.log(x, y, k);
         xy.attr('transform', `translate(${x},${y}) scale(${k})`);
     }
 
@@ -97,24 +93,57 @@ export function ChartProvider(props: any) {
         setKZoom(1);
         select(`#${id}`).transition()
             .call((myZoom as any).transform, zoomIdentity.translate(100, 30).scale(1));
+        setIsDrawingEnabled(true)
+        setZoomCounter(0)
     }
 
     function initZoom() {
         const elem = select(`#${id}`)
-        elem.call(myZoom as any).on("wheel.zoom", null);
-        elem.on('dblclick', (e: any) => {
+        elem.on("wheel.zoom", null);
+        elem.on('dblclick', null)
+        /* elem.on('dblclick', (e: any) => {
+            console.log('we')
             if (getN() <= 30) { setN(getN() + 10) }
 
-        })
+        }) */
 
     }
+    
+    const [rectangle, setRectangle] = createSignal<RectangleData | null>(null);
+    const zoomCalc = createMemo(() => (rectangle() ? divWidth / rectangle()!.width: 1))
 
+    const handleRectangleCreated = (data: RectangleData) => {
+        setRectangle(prev => !prev || prev.x !== data.x ? data : prev);
+    };
+
+    const handleRectanglesCleared = () => {
+        console.log('All rectangles cleared');
+        console.log(rectangle())
+        if (getN() < 30) { setN(getN() + 10) }
+        if (getN() > 10) setKZoom(zoomCalc())
+        if (zoomCounter() > 4) {
+            setIsDrawingEnabled(false)
+            setZoomCounter(0)
+            return
+        } else {
+            setZoomCounter((prev) => prev + 1)
+
+        }
+        const w = (divWidth / 2) - (rectangle()!.x + (rectangle()!.width / 2) * kZoom())
+        const h = (350 / 2) - (rectangle()!.height / 2) * kZoom()
+        select(`#${id}`).transition()
+            .call((myZoom as any).transform, zoomIdentity.translate(w, h).scale(1.5));
+        /* if (getN() <= 30) { setN(getN() + 10) }
+        setKZoom(1.5);
+        select(`#${id}`).transition()
+            .call((myZoom as any).transform, zoomIdentity.translate(rectangle()!.x, 0).scale(1)); */
+    };
 
     const provider = {
-        accessors: { y, getXTicks, x, isZooming }, constants: { containerClass,containerId , margin, height, defaultWidth, divWidth, id }, functions: { initZoom, restoreDefaultWidth }
+        accessors: { y, getXTicks, x, isZooming, isDrawingEnabled }, constants: { containerClass, containerId, margin, height, defaultWidth, divWidth, id }, functions: { initZoom, restoreDefaultWidth, handleRectangleCreated, handleRectanglesCleared, setIsDrawingEnabled }
     }
     return (
-        <ChartContext.Provider value={provider}>
+        <ChartContext.Provider value={provider as any}>
             {props.children}
         </ChartContext.Provider>
     );
