@@ -10,6 +10,7 @@ const ChartContext = createContext<Context>();
 
 export function ChartProvider(props: any) {
     const id = createUniqueId()
+    const containerId = createUniqueId();
 
     const [dataS] = useData()!.data!['data']
     const margin = { top: 30, right: 50, bottom: 120, left: 100 };
@@ -110,7 +111,7 @@ export function ChartProvider(props: any) {
 
 
     const provider = {
-        accessors: { y, getXTicks, x, isZooming }, constants: { containerClass, margin, height, defaultWidth, divWidth, id }, functions: { initZoom, restoreDefaultWidth }
+        accessors: { y, getXTicks, x, isZooming }, constants: { containerClass,containerId , margin, height, defaultWidth, divWidth, id }, functions: { initZoom, restoreDefaultWidth }
     }
     return (
         <ChartContext.Provider value={provider}>

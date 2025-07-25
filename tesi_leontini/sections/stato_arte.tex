@@ -1,0 +1,129 @@
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\chapter{Stato dell'arte}
+\label{chap:stato_arte}
+
+Di seguito sono descritte le sezioni che, in generale, dovrebbero comporre una tesi di laurea. La suddivisione presentata non è strettamente vincolante e dovrebbe essere adattata in base alle esigenze e alle caratteristiche della tesi trattata.
+
+\section{Stato dell'arte}
+
+Nel contesto della visualizzazione e analisi di serie temporali di dati scientifici e ingegneristici, esistono numerose soluzioni e piattaforme che affrontano, con diversi approcci, le criticità legate all’efficienza, alla scalabilità e all’interattività. In questo capitolo vengono analizzate le principali soluzioni esistenti, valutandone le caratteristiche, i punti di forza e le limitazioni, con particolare attenzione alle differenze rispetto alla soluzione proposta in questa tesi.
+
+\subsection{Grafana}
+
+Grafana è una delle piattaforme open source più diffuse per la visualizzazione e il monitoraggio di serie temporali di dati. Offre un’interfaccia utente altamente personalizzabile, il supporto a numerosi database (tra cui Prometheus, InfluxDB, MySQL) e la possibilità di creare dashboard interattive. Grafana è particolarmente apprezzata per la sua modularità e per l’ampia disponibilità di plugin.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Interfaccia user-friendly e altamente personalizzabile.
+    \item Ampio supporto a fonti dati eterogenee.
+    \item Plugin per integrazione con sistemi di alerting e notifiche.
+    \item Attiva comunità open source.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Alcune funzionalità avanzate richiedono la versione enterprise.
+    \item La gestione di dataset molto grandi può risultare onerosa in termini di risorse.
+    \item Lato client non sempre ottimizzato per dispositivi mobili.
+    \item La condivisione dello stato tramite URL non è sempre completa e trasparente.
+\end{itemize}
+
+\textbf{Differenze rispetto alla soluzione proposta:}
+La soluzione proposta, rispetto a Grafana, si concentra su una gestione più efficiente dello stato tramite URL, sull’esportazione avanzata delle visualizzazioni e su una maggiore ottimizzazione delle prestazioni lato client, soprattutto in ambiente mobile.
+
+\subsection{Kibana}
+
+Kibana è un tool open source principalmente utilizzato per la visualizzazione di dati provenienti da Elasticsearch, ma offre anche funzionalità avanzate di esplorazione e analisi di dati temporali. Kibana consente la creazione di dashboard e report personalizzati, con un focus particolare su dati di log e metriche di sistema.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Integrazione nativa con Elastic Stack.
+    \item Potenti funzionalità di ricerca, filtro e aggregazione.
+    \item Dashboard interattive e personalizzabili.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Dipendenza da Elasticsearch come backend dati.
+    \item Scalabilità e performance dipendono dalla configurazione del cluster.
+    \item Curva di apprendimento relativamente elevata per utenti non tecnici.
+\end{itemize}
+
+\textbf{Differenze rispetto alla soluzione proposta:}
+La soluzione proposta offre maggiore flessibilità nella scelta della sorgente dati e una più semplice esportazione dei risultati, oltre a una maggiore leggerezza e semplicità di installazione.
+
+\subsection{Plotly Dash}
+
+Plotly Dash è un framework Python per la creazione di applicazioni web interattive di visualizzazione dati. Consente la realizzazione di dashboard dinamiche, con grafici di elevata qualità e interattività avanzata.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Facilità di utilizzo per chi ha familiarità con Python.
+    \item Ampia gamma di visualizzazioni e grafici interattivi.
+    \item Possibilità di integrare facilmente altri moduli Python per analisi dati.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Performance limitate su dataset di grandi dimensioni.
+    \item Scalabilità server-side non sempre ottimale senza configurazioni avanzate.
+    \item Lato client non sempre reattivo per interazioni complesse.
+\end{itemize}
+
+\textbf{Differenze rispetto alla soluzione proposta:}
+La soluzione proposta, essendo sviluppata interamente in ambiente JavaScript/TypeScript e con tecnologie moderne come SolidJS e Astro, garantisce migliore reattività lato client e un’integrazione più immediata con ecosistemi web già esistenti.
+
+\subsection{Highcharts Cloud}
+
+Highcharts Cloud è una piattaforma SaaS che permette di creare, personalizzare e condividere grafici interattivi direttamente dal browser.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Interfaccia intuitiva e immediata.
+    \item Ampia varietà di grafici disponibili.
+    \item Possibilità di esportazione in diversi formati.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Funzionalità avanzate disponibili solo a pagamento.
+    \item Limitazioni nella personalizzazione dei flussi dati e delle interazioni.
+    \item Non adatto a integrazioni personalizzate o workflow complessi.
+\end{itemize}
+
+\textbf{Differenze rispetto alla soluzione proposta:}
+La piattaforma sviluppata in questa tesi consente una piena integrazione con flussi dati personalizzati e la gestione avanzata dello stato tramite URL, offrendo maggiore flessibilità e possibilità di estensione.
+
+\subsection{Altre soluzioni open source e librerie JavaScript}
+
+Esistono numerose librerie JavaScript per la visualizzazione di serie temporali, tra cui D3.js, Chart.js, e ECharts. Queste librerie forniscono strumenti potenti per la creazione di grafici, ma richiedono spesso sviluppi ad hoc per integrare funzionalità avanzate come la gestione dello stato, il confronto tra scenari, o l’esportazione delle visualizzazioni.
+
+\textbf{Vantaggi:}
+\begin{itemize}
+    \item Estrema flessibilità e possibilità di personalizzazione.
+    \item Ampia comunità di supporto.
+    \item Elevate performance se utilizzate correttamente.
+\end{itemize}
+
+\textbf{Svantaggi:}
+\begin{itemize}
+    \item Necessità di competenze avanzate di sviluppo front-end.
+    \item Mancanza di funzionalità pronte all’uso per la gestione avanzata dello stato o l’esportazione.
+    \item Maggiore effort di integrazione con sistemi backend.
+\end{itemize}
+
+\textbf{Differenze rispetto alla soluzione proposta:}
+La soluzione proposta integra nativamente funzionalità di gestione avanzata dello stato, esportazione e confronto, riducendo così il tempo e l’effort richiesti per ottenere un prodotto finale pronto all’uso.
+
+\section{Sintesi e confronto}
+
+Dall’analisi delle soluzioni esistenti emerge che, sebbene siano disponibili strumenti potenti e flessibili per la visualizzazione di dati temporali, nessuna delle piattaforme considerate offre contemporaneamente:
+\begin{itemize}
+    \item prestazioni elevate anche su dataset di grandi dimensioni;
+    \item gestione avanzata dello stato e della navigazione tramite URL;
+    \item funzionalità di confronto tra stati multipli;
+    \item esportazione facile e personalizzata delle visualizzazioni;
+    \item massima compatibilità e performance su dispositivi mobili e desktop.
+\end{itemize}
+
+La soluzione proposta in questa tesi si colloca quindi come un’alternativa innovativa, in grado di coniugare le migliori pratiche di sviluppo web moderno con funzionalità avanzate e performance ottimizzate per le esigenze della ricerca scientifica e dell’industria.

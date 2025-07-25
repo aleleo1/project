@@ -1,4 +1,4 @@
-import { For, Show, batch, createEffect, onMount } from "solid-js";
+import { For, Show, batch, createEffect, createUniqueId, onMount } from "solid-js";
 import { useData } from "../contexts/dataContext";
 import { formatDate } from "../utils";
 import { useAttention } from "../contexts/attentionContext";
@@ -9,7 +9,7 @@ export default function Chart_2() {
   const { loadNewData, loadNewDataWithScroll, isRt } = useData()!.functions as any
   const da = useAttention()!.signals!['dataAttention']
   const { y, getXTicks, x, isZooming } = useChart()!.accessors as any
-  const { margin, height, containerClass, divWidth, id } = useChart()!.constants as any
+  const {containerId, margin, height, containerClass, divWidth, id } = useChart()!.constants as any
   const refetch = useData()!.signals!['refetch']
   const { initZoom } = useChart()!.functions as any
   const dataS = useData()!.functions!['dataS']
@@ -22,7 +22,7 @@ export default function Chart_2() {
 
   return (
     <div class={`p-10 ${containerClass}`}>
-      <div ref={container} style={{ 'width': `${divWidth}`, height: '350px', 'overflow-x': 'auto', "overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px' }} onscroll={loadNewDataWithScroll}>
+      <div  id={`${containerId}`} ref={container} style={{ 'width': `${divWidth}`, height: '350px', 'overflow-x': 'auto', "overflow-y": 'hidden', "scroll-behavior": "smooth", padding: '10px' }} onscroll={loadNewDataWithScroll}>
         <svg id={id} ref={chartContainer} style={{ display: 'block' }} width={divWidth} height="350" viewBox={`0 0 ${divWidth} 350`}>
           <Show when={!isRt() && !download}>
             <g onClick={loadNewData}>

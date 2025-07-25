@@ -1,0 +1,258 @@
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\chapter{Tecnologie adottate}
+\label{chap:tecnologie_adottate}
+\subsection{Introduzione}
+La scelta delle tecnologie rappresenta un punto cruciale per qualsiasi progetto software moderno. In questa sezione vengono descritte in modo approfondito le principali tecnologie selezionate, le motivazioni alla base delle scelte effettuate, i vantaggi, i limiti e le modalità di integrazione tra i vari strumenti.
+
+\subsection{AstroJS}
+AstroJS è un moderno framework per lo sviluppo web, progettato per generare siti statici e dinamici ad alte prestazioni tramite un’architettura “island-based”. Le principali caratteristiche di Astro includono:
+\begin{itemize}
+    \item Generazione di siti statici e supporto SSR (Server Side Rendering)
+    \item Compatibilità con componenti React, Vue, Svelte, SolidJS, e altri
+    \item Ottimizzazione automatica del bundle: viene caricato solo il codice strettamente necessario
+    \item Supporto per la scrittura di pagine e componenti in Markdown, MDX e altri formati
+\end{itemize}
+\textbf{Vantaggi:} performance eccellenti, grande flessibilità, community in crescita, facilità di integrazione.
+\textbf{Svantaggi:} alcune API ancora in fase di maturazione, documentazione non sempre esaustiva.
+
+\subsection{SolidJS}
+SolidJS viene utilizzato per la creazione di componenti altamente reattivi. Rispetto ad altri framework, SolidJS offre:
+\begin{itemize}
+    \item Aggiornamenti puntuali e granulari del DOM
+    \item Bundle estremamente ridotti
+    \item Un modello reattivo ispirato a S.js ma con API più moderne
+\end{itemize}
+L’integrazione con Astro avviene tramite le cosiddette “isole interattive”, consentendo di aggiungere interattività solo dove realmente necessario.
+
+\subsection{D3.js}
+D3.js è una delle librerie JavaScript più potenti per la visualizzazione di dati. Permette:
+\begin{itemize}
+    \item Creazione di grafici e visualizzazioni interattive e dinamiche
+    \item Manipolazione diretta del DOM basata sui dati
+    \item Un’ampia gamma di funzioni di animazione e transizione
+\end{itemize}
+
+\subsection{Integrazione avanzata di D3.js con SolidJS}
+
+D3.js (Data-Driven Documents) è una potente libreria JavaScript per la manipolazione del DOM e la creazione di visualizzazioni di dati dinamiche e interattive. Nel contesto di questo progetto, D3.js viene utilizzato in sinergia con SolidJS, un moderno framework reattivo che garantisce performance elevate e un aggiornamento ottimale dell’interfaccia utente.
+
+\subsubsection{Motivazioni dell’integrazione}
+
+L’unione di D3.js e SolidJS nasce dall’esigenza di:
+\begin{itemize}
+    \item sfruttare la potenza di D3.js nella generazione e manipolazione di SVG per visualizzazioni avanzate (\textit{bar chart}, \textit{line chart}, \textit{force-directed graph}, ecc.);
+    \item mantenere la reattività, la modularità e la scalabilità garantite dall’architettura component-based di SolidJS;
+    \item garantire aggiornamenti efficienti della visualizzazione in risposta ai cambiamenti dei dati, sfruttando il sistema di signals e store di SolidJS.
+\end{itemize}
+
+\subsubsection{Pattern di utilizzo}
+
+L’approccio tipico prevede l’incapsulamento delle logiche imperative di D3.js all’interno di componenti SolidJS. Si segue generalmente il pattern:
+\begin{enumerate}
+    \item Creazione di un \texttt{ref} verso un nodo DOM (tipicamente un elemento \texttt{<svg>}).
+    \item Utilizzo di effetti (\texttt{createEffect}) di SolidJS per orchestrare l’inizializzazione e l’aggiornamento delle visualizzazioni D3.js.
+    \item Separazione tra logica di presentazione (gestita da SolidJS) e logica di rendering/animazione (delegata a D3.js).
+\end{enumerate}
+
+\subsubsection{Esempio pratico: Bar chart reattivo}
+
+\begin{verbatim}
+import { createSignal, createEffect } from "solid-js";
+import * as d3 from "d3";
+
+function BarChart(props) {
+  let svgRef;
+  const [data, setData] = createSignal(props.initialData);
+
+  createEffect(() => {
+    const svg = d3.select(svgRef);
+    svg.selectAll("*").remove(); // pulizia
+    svg
+      .attr("width", 400)
+      .attr("height", 200);
+    // ... logica di rendering D3 ...
+    svg.selectAll("rect")
+      .data(data())
+      .enter()
+      .append("rect")
+      .attr("x", (...))
+      .attr("y", (...))
+      .attr("width", (...))
+      .attr("height", (...))
+      .attr("fill", "steelblue");
+  });
+
+  return (
+    <svg ref={el => svgRef = el}></svg>
+  );
+}
+\end{verbatim}
+Questo pattern consente di aggiornare dinamicamente la visualizzazione semplicemente modificando il \texttt{signal} \texttt{data}, lasciando che SolidJS e D3.js gestiscano in modo ottimale il rendering.
+
+\subsubsection{Gestione delle performance e delle risorse}
+
+Un aspetto critico nella gestione di D3.js con framework reattivi è evitare il conflitto tra la gestione del DOM da parte di D3.js (imperativa) e quella di SolidJS (dichiarativa). Le best practice includono:
+\begin{itemize}
+    \item Isolare l’interazione di D3.js al solo elemento SVG, lasciando la struttura generale del DOM sotto il controllo di SolidJS.
+    \item Evitare che D3.js manipoli direttamente elementi gestiti da SolidJS.
+    \item Utilizzare \texttt{onCleanup} di SolidJS per rimuovere event listener o risorse create da D3.js.
+\end{itemize}
+
+\subsubsection{Personalizzazione e animazioni}
+
+D3.js fornisce API avanzate per transizioni e animazioni:
+\begin{itemize}
+    \item Le transizioni possono essere gestite direttamente nell’effetto SolidJS, aggiornando la visualizzazione in risposta ai cambiamenti dei dati.
+    \item È possibile combinare signals SolidJS per animazioni controllate dall’utente (ad esempio, filtri interattivi o zoom).
+\end{itemize}
+
+\subsubsection{Testing e manutenibilità}
+
+Per mantenere il codice testabile e manutenibile:
+\begin{itemize}
+    \item Separare la logica di preparazione dati da quella di rendering.
+    \item Scrivere funzioni pure per la trasformazione dei dati prima di passarli a D3.js.
+    \item Documentare le dipendenze tra signals SolidJS e rendering D3.js.
+\end{itemize}
+
+\subsubsection{Esempi di applicazione}
+
+Nel progetto sono stati sviluppati diversi componenti che sfruttano questa integrazione, tra cui:
+\begin{itemize}
+    \item \textbf{Grafici a barre interattivi}: che si aggiornano in tempo reale all’arrivo di nuovi dati.
+    \item \textbf{Heatmap dinamiche}: per visualizzare grandi volumi di dati con filtri live.
+    \item \textbf{Diagrammi personalizzati}: come grafici a dispersione, istogrammi e timeline, integrati all’interno di dashboard SolidJS.
+\end{itemize}
+
+\subsubsection{Conclusioni}
+
+La combinazione di D3.js e SolidJS consente di realizzare visualizzazioni dati potenti, interattive e scalabili, mantenendo alta la manutenibilità del codice. Questo approccio risulta ideale in progetti dove la visualizzazione dati è parte centrale dell’esperienza utente e richiede aggiornamenti frequenti e reattivi.
+
+\subsection{TailwindCSS}
+TailwindCSS è un framework utility-first per la scrittura di CSS. È stato scelto per:
+\begin{itemize}
+    \item Rapidità nello sviluppo di interfacce responsive
+    \item Ottima integrazione con Astro e gli altri framework JS
+    \item Eliminazione del CSS inutilizzato in produzione tramite purge
+\end{itemize}
+\textbf{Best practice:} uso di classi personalizzate, design system condiviso, temi custom.
+
+\subsection{Node.js e Vite}
+Node.js costituisce il runtime per l’esecuzione del backend (API, server SSR), mentre Vite viene utilizzato come build tool:
+\begin{itemize}
+    \item Vite offre hot module replacement (HMR) e build ultraveloci
+    \item Gestione avanzata delle dipendenze e supporto TypeScript nativo
+\end{itemize}
+
+\subsection{MySQL e l’adapter per AstroJS}
+
+\subsubsection{Introduzione a MySQL}
+MySQL è uno dei database relazionali open source più diffusi. I suoi punti di forza sono:
+\begin{itemize}
+    \item Elevata affidabilità e robustezza
+    \item Ottime performance su dataset anche di grandi dimensioni
+    \item Ampio supporto nella community e documentazione completa
+\end{itemize}
+
+\subsubsection{Integrazione di MySQL con AstroJS: architettura e pattern}
+AstroJS non offre un’integrazione nativa con MySQL, ma sfruttando le API server-side (in Node.js) è possibile collegarsi al database tramite i driver ufficiali (ad esempio \texttt{mysql2}) o ORM come Drizzle o Prisma.
+
+\textbf{Architettura tipica:}
+\begin{itemize}
+    \item Le richieste provenienti dal frontend vengono instradate verso API route definite all’interno di \texttt{src/pages/api/}
+    \item In queste route, grazie al driver MySQL, vengono eseguite le query necessarie
+    \item I dati vengono restituiti in formato JSON alle pagine Astro, che li renderizzano lato server o client
+\end{itemize}
+
+\textbf{Esempio base di adapter:}
+\begin{verbatim}
+import mysql from 'mysql2/promise';
+export async function getServerSideData() {
+  const connection = await mysql.createConnection({
+    host: 'localhost',
+    user: 'utente',
+    password: 'password',
+    database: 'nome_database'
+  });
+  const [rows] = await connection.execute('SELECT * FROM tabella');
+  await connection.end();
+  return rows;
+}
+\end{verbatim}
+
+\textbf{Best practice:} 
+\begin{itemize}
+    \item Utilizzo del pooling delle connessioni in produzione
+    \item Gestione sicura delle credenziali tramite variabili d’ambiente
+    \item Validazione e sanitizzazione dei dati lato server
+    \item Separazione tra logica di presentazione e accesso ai dati
+\end{itemize}
+
+\subsubsection{Gestione avanzata: pooling, sicurezza e performance}
+Per progetti di medio-grandi dimensioni si consiglia:
+\begin{itemize}
+    \item Uso di un pool di connessioni per evitare overhead di connessione/disconnessione
+    \item Gestione degli errori con retry e fallback
+    \item Audit e logging delle query per il monitoraggio della sicurezza e performance
+    \item Utilizzo di ORM per astrarre la logica SQL e aumentare la manutenibilità
+\end{itemize}
+
+\subsubsection{Esempio di pool di connessioni}
+\begin{verbatim}
+import mysql from 'mysql2/promise';
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'utente',
+  password: 'password',
+  database: 'nome_database',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
+export async function getData() {
+  const [rows] = await pool.execute('SELECT * FROM tabella');
+  return rows;
+}
+\end{verbatim}
+
+\subsection{Architettura del progetto e modularità}
+Il progetto è suddiviso nei seguenti macro-moduli:
+\begin{itemize}
+    \item \textbf{Frontend}: rendering delle pagine, interattività UI, visualizzazione dati
+    \item \textbf{Backend/API}: gestione autenticazione, accesso dati, logica di business
+    \item \textbf{Database}: schemi, migrazioni e procedure
+    \item \textbf{DevOps}: pipeline CI/CD, deployment, monitoraggio
+\end{itemize}
+Ogni modulo comunica tramite API RESTful o chiamate dirette lato server.
+
+\subsection{Confronti con tecnologie alternative}
+\begin{itemize}
+    \item \textbf{Astro vs Next.js}: Astro offre maggiore ottimizzazione static site, Next.js più maturo per SSR puro
+    \item \textbf{SolidJS vs React}: SolidJS più leggero e reattivo, React con più librerie e community
+    \item \textbf{MySQL vs PostgreSQL}: MySQL più semplice da configurare, PostgreSQL più avanzato per query complesse e tipi di dato
+\end{itemize}
+
+\subsection{Testing e qualità del software}
+\begin{itemize}
+    \item Test unitari per logica backend
+    \item Test end-to-end per flussi utente principali
+    \item Linting e code style condiviso tramite ESLint/Prettier
+    \item Monitoraggio coverage e metriche di qualità
+\end{itemize}
+
+\subsection{Pipeline di deploy e CI/CD}
+\begin{itemize}
+    \item Utilizzo di GitHub Actions per build, test, deploy automatico
+    \item Deploy su ambienti staging e produzione con rollback automatizzato
+\end{itemize}
+
+\subsection{Esperienze e lezioni apprese}
+Durante lo sviluppo sono emersi vari punti di attenzione:
+\begin{itemize}
+    \item Importanza della modularità per facilitare il refactoring
+    \item Convenienza di Astro per progetti SEO-oriented o landing page dinamiche
+    \item Gestione efficace degli errori e della scalabilità lato API
+\end{itemize}
+
+\subsection{Conclusioni}
+La combinazione di AstroJS, SolidJS, D3.js, TailwindCSS, Node.js, Vite e MySQL ha permesso di raggiungere obiettivi di performance, scalabilità e manutenibilità. L’adozione di best practice e pattern evoluti ha ridotto il debito tecnico e migliorato la qualità complessiva del progetto.
