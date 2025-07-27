@@ -116,15 +116,18 @@ export function DataProvider(props: any) {
         const q = url.searchParams.get('q')
         const d = new Date(url.searchParams.get('date')!)
         d.setMonth(d.getMonth() - 6)
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // eslint-dable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         refetch[1]({ q: q, date: formatDate(d), action: Actions.partial })
     }
 
     const loadNewDataWithDate = (prop: keyof QueryParams, value: Date) => refetch[1]({ [prop]: value, action: Actions.full } as any)
 
-    const provider = { signals: { refetch, href }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate, rif, date, dataS, isRt }, constants: {download: !!props.download} }
+    const provider = { signals: { refetch, href }, data: { data }, functions: { loadNewDataWithScroll, loadNewData, loadNewDataWithDate, rif, date, dataS, isRt }, constants: { download: !!props.download } }
 
+    onCleanup(() => {
+        data[1].mutate([])
+    })
     return (
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore

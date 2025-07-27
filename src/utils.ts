@@ -328,8 +328,6 @@ export function randomizeDifferentNumber(
 
 export function getDeviceDetails(userAgent: string) {
   // For logging/debugging
-  console.log("User-Agent:", userAgent);
-
   const deviceInfo = {
     isMobile:
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(

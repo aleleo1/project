@@ -15,10 +15,11 @@ interface SvgDrawingComponentProps {
 
 const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
     const [svgRef, setSvgRef] = createSignal<SVGSVGElement>();
-    const [drawer, setDrawer] = createSignal<RectangleDrawer | null>(null);
     const { download } = useData()!.constants!
-    const { setIsDrawingEnabled } = useChart()!.functions as any;
+    const { setIsDrawingEnabled, setDrawer } = useChart()!.functions as any;
+    const { drawer, boundaries } = useChart()!.accessors as any;
     const { isDrawingEnabled } = useChart()!.accessors as any;
+    const { dataS } = useData()!.functions as any
     const loadDrawer = async (svgElement: SVGSVGElement) => {
         try {
             // Dynamic import - only loads when enableDrawing is true
@@ -37,7 +38,10 @@ const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
 
     const handleRectangleCreated = (event: CustomEvent) => {
         const { x, y, width, height } = event.detail;
-        props.onRectangleCreated?.({ x, y, width, height });
+        const index0 = boundaries()[0];
+        const index1 = boundaries()[1]
+
+        props.onRectangleCreated?.({ x, y, width, height, index0, index1 });
     };
 
     const handleRectanglesCleared = () => {
@@ -87,9 +91,12 @@ const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
     });
 
     createEffect(on(isDrawingEnabled, () => {
-        handleDrawing();
-        console.log(isDrawingEnabled())
-    }))
+        if (isDrawingEnabled()) {
+            drawer()!.enable();
+        } else {
+            drawer()!.disable();
+        }
+    }, { defer: true }))
 
     // Cleanup on unmount
     onCleanup(() => {
@@ -104,32 +111,9 @@ const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
         }
     });
 
-    // Public methods for parent components
-    const clearRectangles = () => {
-        drawer()?.clear();
-    };
-
-    const undoLastRectangle = () => {
-        drawer()?.undo();
-    };
-
-    const getRectangleData = (): RectangleData | null => {
-        return drawer()?.getRectangleData() ?? null;
-    };
-
-    const handleDrawing = () => {
-        const currentDrawer = drawer();
-        if (currentDrawer) {
-            if (isDrawingEnabled()) {
-                currentDrawer.enable();
-            } else {
-                currentDrawer.disable();
-            }
-        }
-    };
 
     return (
-        <div style={{ "z-index": isDrawingEnabled() ? 1000 : 10 }}>
+        <div>
             <Show when={!download} fallback={props.children} >
 
                 <div class="controls" style={{
@@ -153,8 +137,12 @@ const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
                     >
                         {isDrawingEnabled() ? 'Disable Zoom' : 'Enable Zoom'}
                     </button>
-
-
+                    <Show when={boundaries()[0] !== -1}>
+                        <p>{new Date(dataS()![boundaries()[0]].date).toDateString()}</p>
+                    </Show>
+                    <Show when={boundaries()[1] !== -1}>
+                        {new Date(dataS()![boundaries()[1]].date).toDateString()}
+                    </Show>
                 </div>
 
                 <div

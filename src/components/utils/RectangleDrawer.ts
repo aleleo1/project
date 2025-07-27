@@ -26,6 +26,8 @@ export interface RectangleData {
   y: number;
   width: number;
   height: number;
+  index0: number;
+  index1: number;
 }
 
 export interface RectangleCreatedEvent extends CustomEvent {
@@ -115,6 +117,10 @@ export class RectangleDrawer {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
     };
+  }
+
+  public getIsDrawing() {
+    return this.isDrawing;
   }
 
   /**
@@ -225,7 +231,7 @@ export class RectangleDrawer {
   /**
    * Create a permanent rectangle
    */
-  private createRectangle(x: number, y: number, width: number, height: number): SVGRectElement {
+  private createRectangle(x: number, y: number, width: number, height: number): SVGRectElement | null {
     const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttribute('x', x.toString());
     rect.setAttribute('y', y.toString());
@@ -306,7 +312,7 @@ export class RectangleDrawer {
   public clear(): void {
     if (this.rectangle) {
       this.rectangle!.remove();
-      //this.rectangle = null;
+      this.rectangle = null;
       this.svg.dispatchEvent(new CustomEvent('rectanglesCleared'));
     }
 
@@ -345,7 +351,9 @@ export class RectangleDrawer {
         x: parseFloat(rect.getAttribute('x') || '0'),
         y: parseFloat(rect.getAttribute('y') || '0'),
         width: parseFloat(rect.getAttribute('width') || '0'),
-        height: parseFloat(rect.getAttribute('height') || '0')
+        height: parseFloat(rect.getAttribute('height') || '0'),
+        index0: -1,
+        index1: -1
       }
     } else { return null }
   };

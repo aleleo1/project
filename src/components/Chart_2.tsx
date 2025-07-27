@@ -9,10 +9,10 @@ export default function Chart_2() {
   let container;
   const { loadNewData, loadNewDataWithScroll, isRt } = useData()!.functions as any
   const da = useAttention()!.signals!['dataAttention']
-  const { y, getXTicks, x, isZooming , isDrawingEnabled} = useChart()!.accessors as any
+  const { y, getXTicks, x, isDrawingEnabled, boundaries } = useChart()!.accessors as any
   const { containerId, margin, height, containerClass, divWidth, id } = useChart()!.constants as any
   const refetch = useData()!.signals!['refetch']
-  const { initZoom, handleRectangleCreated, handleRectanglesCleared } = useChart()!.functions as any
+  const { initZoom, handleRectangleCreated, handleRectanglesCleared, setBoundaries } = useChart()!.functions as any
   const dataS = useData()!.functions!['dataS']
   const download = useData()!.constants!['download']
   onMount(() => {
@@ -21,26 +21,25 @@ export default function Chart_2() {
 
 
 
-  createEffect(() => console.log(isZooming()))
 
   return (
     <div class={`p-10 ${containerClass}`}>
-      <div id={`${containerId}`} ref={container} style={{ 'width': `${divWidth}`, height: '350px', 'overflow-x': 'auto', "overflow-y": 'hidden', "scroll-behavior": "smooth", "z-index": 100 }} onscroll={loadNewDataWithScroll}>
-       
+      <div id={`${containerId}`} ref={container} style={{ 'width': `${divWidth}`, height: '350px', 'overflow-x': 'auto', "overflow-y": 'hidden', "scroll-behavior": "smooth" }} onscroll={loadNewDataWithScroll}>
+
         <SvgDrawingComponent
           enableDrawing={isDrawingEnabled()}
           width={divWidth}
-          height={1000}
+          height={350}
           drawingOptions={{
             minSize: 0,
-            height: height+margin.top,
+            height: height + margin.top,
             y: 0
           }}
           onRectangleCreated={handleRectangleCreated}
           onRectanglesCleared={handleRectanglesCleared}
         >
 
-          <svg id={id} ref={chartContainer} style={{ display: 'block'}} width={divWidth} height="350" viewBox={`0 0 ${divWidth} 350`}>
+          <svg id={id} ref={chartContainer} style={{ display: 'block', "z-index": 50 }} width={divWidth} height="350" viewBox={`0 0 ${divWidth} 350`}>
             <Show when={!isRt() && !download}>
               <g onClick={loadNewData}>
                 <rect fill="#333"
@@ -91,27 +90,45 @@ export default function Chart_2() {
 
               {/* Data lines */}
               <For each={dataS()}>{(item, index) => (
+                <Show when={x()(new Date(item.date)) > 0}>
+                  <line
+                    class="data-line"
+                    x1={x()(new Date(item.date))}
+                    y1={height}
+                    x2={x()(new Date(item.date))}
+                    y2={y()(item.close)}
+                    stroke="steelblue"
+                    stroke-width="0.5"
+                  />
+                </Show>
+              )}</For>
+
+              {/* Ghost Data lines */}
+              <For each={dataS()}>{(item, index) => (
                 <line
                   class="data-line"
                   x1={x()(new Date(item.date))}
                   y1={height}
                   x2={x()(new Date(item.date))}
-                  y2={y()(item.close)}
-                  stroke="steelblue"
+                  y2={height - 350}
+                  stroke="transparent"
                   stroke-width="0.5"
+                  onmouseenter={() => setBoundaries(index())}
                 />
               )}</For>
 
               {/* Data Points */}
               <For each={dataS()}>{(item, index) => (
-                <circle class="data-point cursor-pointer"
-                  cx={x()(new Date(item.date))}
-                  cy={y()(item.close)}
-                  fill={da[0]() && da[0]()!.index === index() ? 'orange' : 'steelblue'}
-                  r={isZooming() ? '2' : (da[0]() && da[0]()!.index === index() ? '5' : '3')}
-                  onMouseOver={() => (batch(() => da[1]({ ...item, index: index() })))}
-                  onMouseOut={() => (batch(() => da[1](undefined)))}
-                ></circle>
+                <Show when={x()(new Date(item.date)) > 0}>
+                  <circle class="data-point cursor-pointer"
+                    cx={x()(new Date(item.date))}
+                    cy={y()(item.close)}
+                    fill={da[0]() && da[0]()!.index === index() ? 'orange' : 'steelblue'}
+                    r={2}
+                    onMouseOver={() => (batch(() => da[1]({ ...item, index: index() })))}
+                    onMouseOut={() => (batch(() => da[1](undefined)))}
+                  ></circle>
+                </Show>
               )}</For>
             </g>
 
