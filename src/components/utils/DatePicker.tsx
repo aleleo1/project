@@ -8,6 +8,7 @@ import "flatpickr/dist/flatpickr.min.css";
 export default function DatePickers(p: any) {
     const { loadNewDataWithDate, date, rif } = useData()!.functions as any
     const id = useChart()!.constants!['id']
+    const isDrawing = useChart()!.accessors!['zoomCounter'];
 
     let d1Instance: any;
     let d2Instance: any;
@@ -54,7 +55,7 @@ export default function DatePickers(p: any) {
 
     return (
         <>
-            <div class="relative">
+            <div class="relative tooltip" data-tip="Impossibile cambiare il range con zoom attivo">
                 <input
                     id={`${id}-d1`}
                     class="flatpickr-input border rounded px-2 py-1"
@@ -67,10 +68,11 @@ export default function DatePickers(p: any) {
                             event.target.value = rif();
                         }
                     }}
+                    disabled={isDrawing()}
                 />
             </div>
 
-            <div class="relative">
+            <div class="relative tooltip" data-tip="Impossibile cambiare il range con zoom attivo">
                 <input
                     id={`${id}-d2`}
                     class="flatpickr-input border rounded px-2 py-1"
@@ -83,6 +85,7 @@ export default function DatePickers(p: any) {
                             event.target.value = date();
                         }
                     }}
+                    disabled={isDrawing()}
                 />
             </div>
         </>

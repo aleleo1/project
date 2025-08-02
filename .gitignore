@@ -25,3 +25,5 @@ pnpm-debug.log*
 
 Dockerfile.dev
 docker-compose.yml
+
+src/solid-chart-container/*

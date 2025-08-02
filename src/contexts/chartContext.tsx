@@ -6,7 +6,6 @@ import { biggerNotNullDate, get_DEFAULT_DATES } from "../utils";
 import { isServer } from "solid-js/web";
 import type { RectangleData, RectangleDrawer } from "../components/utils/RectangleDrawer";
 
-const zoomMap = [1.2, 1.6, 2, 2.4]
 const ChartContext = createContext<Context>();
 
 export function ChartProvider(props: any) {
@@ -61,6 +60,9 @@ export function ChartProvider(props: any) {
         return scaleUtc([firstDate, lastDate], range);
     });
 
+    const xLines = createMemo(() => dataS()!.map(d => x()(new Date(d.date))))
+
+
     const getXTicks = createMemo(() => {
         const start = getFirstDate()
         return Array.from({ length: (getN()) }, (_, i) =>
@@ -68,10 +70,12 @@ export function ChartProvider(props: any) {
     })
 
     //ASSE Y
-    const yScale = scaleLinear()
+    const yScale = createMemo(() => scaleLinear()
         .nice()
-        .range([height, 0]);
-    const y = createMemo(() => yScale.domain([0, max(dataS()!, d => d.close)! ?? 1]))
+        .range([height, 0]));
+
+
+    const y = createMemo(() => yScale().domain([0, max(dataS()!, d => d.close)! ?? 1]))
     const containerClass = `w-[${defaultWidth}px]`
 
 
@@ -111,12 +115,16 @@ export function ChartProvider(props: any) {
 
     const setBoundaries = (index: number) => {
         if (drawer()?.getIsDrawing()) {
+            if (buffBounds()[0] !== -1 && index < buffBounds()[0]) {
+                return;
+            }
             setBuffBounds(orderNumsArr(buffBounds()[0] === -1 ? [index, buffBounds()[1]] : [buffBounds()[0], index]))
         }
     }
 
+
     const provider = {
-        accessors: { y, getXTicks, x, isDrawingEnabled, drawer, boundaries }, constants: { containerClass, containerId, margin, height, defaultWidth, divWidth, id }, functions: { initZoom, restoreDefaultWidth, handleRectanglesCleared, setIsDrawingEnabled, setBoundaries, setDrawer }
+        accessors: { y, getXTicks, x, isDrawingEnabled, drawer, boundaries, xLines, zoomCounter, buffBounds }, constants: { containerClass, containerId, margin, height, defaultWidth, divWidth, id }, functions: { initZoom, restoreDefaultWidth, handleRectanglesCleared, setIsDrawingEnabled, setBoundaries, setDrawer }
     }
 
     onCleanup(() => {

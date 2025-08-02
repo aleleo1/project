@@ -17,8 +17,7 @@ const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
     const [svgRef, setSvgRef] = createSignal<SVGSVGElement>();
     const { download } = useData()!.constants!
     const { setIsDrawingEnabled, setDrawer } = useChart()!.functions as any;
-    const { drawer, boundaries } = useChart()!.accessors as any;
-    const { isDrawingEnabled } = useChart()!.accessors as any;
+    const { drawer, boundaries, isDrawingEnabled, buffBounds } = useChart()!.accessors as any;
     const { dataS } = useData()!.functions as any
     const loadDrawer = async (svgElement: SVGSVGElement) => {
         try {
@@ -26,6 +25,8 @@ const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
             const newDrawer = new RectangleDrawer(svgElement, props.drawingOptions);
 
             // Set up event listeners
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
             svgElement.addEventListener('rectangleCreated', handleRectangleCreated);
             svgElement.addEventListener('rectanglesCleared', handleRectanglesCleared);
 
@@ -104,6 +105,8 @@ const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
         if (currentDrawer) {
             const svg = svgRef();
             if (svg) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
                 svg.removeEventListener('rectangleCreated', handleRectangleCreated);
                 svg.removeEventListener('rectanglesCleared', handleRectanglesCleared);
             }
@@ -142,6 +145,12 @@ const SvgDrawingComponent: Component<SvgDrawingComponentProps> = (props) => {
                     </Show>
                     <Show when={boundaries()[1] !== -1}>
                         {new Date(dataS()![boundaries()[1]].date).toDateString()}
+                    </Show>
+                    <Show when={buffBounds()[0] !== -1}>
+                        <p>{new Date(dataS()![buffBounds()[0]].date).toDateString()}</p>
+                    </Show>
+                    <Show when={buffBounds()[1] !== -1}>
+                        {new Date(dataS()![buffBounds()[1]].date).toDateString()}
                     </Show>
                 </div>
 

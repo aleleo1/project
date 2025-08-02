@@ -9,7 +9,7 @@ export default function Chart_2() {
   let container;
   const { loadNewData, loadNewDataWithScroll, isRt } = useData()!.functions as any
   const da = useAttention()!.signals!['dataAttention']
-  const { y, getXTicks, x, isDrawingEnabled, boundaries } = useChart()!.accessors as any
+  const { y, getXTicks, x, isDrawingEnabled, xLines } = useChart()!.accessors as any
   const { containerId, margin, height, containerClass, divWidth, id } = useChart()!.constants as any
   const refetch = useData()!.signals!['refetch']
   const { initZoom, handleRectangleCreated, handleRectanglesCleared, setBoundaries } = useChart()!.functions as any
@@ -93,28 +93,24 @@ export default function Chart_2() {
                 <Show when={x()(new Date(item.date)) > 0}>
                   <line
                     class="data-line"
-                    x1={x()(new Date(item.date))}
+                    x1={xLines()[index()]}
                     y1={height}
-                    x2={x()(new Date(item.date))}
+                    x2={xLines()[index()]}
                     y2={y()(item.close)}
                     stroke="steelblue"
                     stroke-width="0.5"
                   />
+                  <line
+                    class="data-line"
+                    x1={x()(new Date(item.date))}
+                    y1={height}
+                    x2={x()(new Date(item.date))}
+                    y2={height - 350}
+                    stroke="yellow"
+                    stroke-width="1"
+                    onmouseover={() => setBoundaries(index())}
+                  />
                 </Show>
-              )}</For>
-
-              {/* Ghost Data lines */}
-              <For each={dataS()}>{(item, index) => (
-                <line
-                  class="data-line"
-                  x1={x()(new Date(item.date))}
-                  y1={height}
-                  x2={x()(new Date(item.date))}
-                  y2={height - 350}
-                  stroke="transparent"
-                  stroke-width="0.5"
-                  onmouseenter={() => setBoundaries(index())}
-                />
               )}</For>
 
               {/* Data Points */}
