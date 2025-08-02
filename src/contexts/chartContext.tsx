@@ -6,7 +6,6 @@ import { biggerNotNullDate, get_DEFAULT_DATES } from "../utils";
 import { isServer } from "solid-js/web";
 import type { RectangleData, RectangleDrawer } from "../components/utils/RectangleDrawer";
 
-const zoomMap = [1.2, 1.6, 2, 2.4]
 const ChartContext = createContext<Context>();
 
 export function ChartProvider(props: any) {
