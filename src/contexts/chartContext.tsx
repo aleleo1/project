@@ -4,7 +4,7 @@ import { scaleUtc, scaleLinear, max, zoom, select, zoomIdentity } from "d3";
 import { useData } from "./dataContext";
 import { biggerNotNullDate, get_DEFAULT_DATES } from "../utils";
 import { isServer } from "solid-js/web";
-import type { RectangleData, RectangleDrawer } from "../components/utils/RectangleDrawer";
+import type { RectangleDrawer } from "../components/utils/RectangleDrawer";
 
 const ChartContext = createContext<Context>();
 

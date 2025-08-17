@@ -1,4 +1,4 @@
-import { createContext, createEffect, createSignal, useContext, } from "solid-js";
+import { createContext, createSignal, useContext, } from "solid-js";
 import type { Context, DataPoint } from "../interfaces";
 
 

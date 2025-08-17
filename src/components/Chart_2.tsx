@@ -1,4 +1,4 @@
-import { For, Show, batch, createEffect, createSignal, createUniqueId, onMount } from "solid-js";
+import { For, Show, batch, onMount } from "solid-js";
 import { useData } from "../contexts/dataContext";
 import { formatDate } from "../utils";
 import { useAttention } from "../contexts/attentionContext";
@@ -112,7 +112,7 @@ export default function Chart_2() {
                   x2={x()(new Date(item.date))}
                   y2={height - 350}
                   stroke="transparent"
-                  stroke-width="0.5"
+                  stroke-width="2"
                   onmouseenter={() => setBoundaries(index())}
                 />
               )}</For>
