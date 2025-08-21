@@ -1,8 +1,7 @@
-import { For, Show, batch, createMemo, createSignal, createUniqueId, onMount, type Accessor } from "solid-js";
+import { For, Show, batch, createMemo, createSignal, createUniqueId, type Resource } from "solid-js";
 import { formatDate } from "../utils";
 import type { DataPoint, UsePlotVariablesReturnType } from "../interfaces";
 import Xaxis from "./Xaxis";
-import { useData } from "../contexts/dataContext";
 import { scaleUtc, scaleLinear } from 'd3-scale';
 
 interface Rectangle {
@@ -22,28 +21,9 @@ interface DateRange {
     dataPoints: any[];
 }
 
-export default function PlotDefinition(props: { formData?: UsePlotVariablesReturnType }) {
-    const [formData, setFormData] = createSignal(props.formData);
 
-    onMount(async () => {
-        if (!formData()) {
-            setFormData((await import('./utils/plotUtils')).default());
-        }
-    });
-
-    return (
-        <>
-            {formData() ? (
-                <Plot formData={formData()!}></Plot>
-            ) : (
-                <div>Loading plot data...</div>
-            )}
-        </>
-    );
-}
-
-function Plot(props: { formData: UsePlotVariablesReturnType }) {
-
+export default function Plot(props: { formData: UsePlotVariablesReturnType, dataS: Resource<DataPoint[]> }) {
+    /*  */
     const formData = props.formData;
     let chartContainer: SVGSVGElement | undefined;
 
@@ -62,15 +42,14 @@ function Plot(props: { formData: UsePlotVariablesReturnType }) {
     const [manualEndDate, setManualEndDate] = createSignal<string>("");
 
     // DRAGGING AND PANNING STATE
-    const [isDragging, setIsDragging] = createSignal(false);
+    const [isDragging, setIsDragging] = createSignal(true);
     const [dragStart, setDragStart] = createSignal<{ x: number, y: number } | null>(null);
     const [panOffset, setPanOffset] = createSignal(0); // Offset for panning in pixels
     const [viewWindowSize, setViewWindowSize] = createSignal(1); // Fraction of total data (0.1 to 1.0)
 
-    // ARRAYS/OBJECTS
-    const dataS = useData()!.functions!['dataS'] as Accessor<DataPoint[]>
-    const refetch = useData()!.signals!['refetch']! as any
-    const { loadNewData } = useData()!.functions as any
+    const dataS = props.dataS //useData()!.functions!['dataS'] as >
+    /* const refetch = useData()!.signals!['refetch']! as any
+    const { loadNewData } = useData()!.functions as any */
 
     //const { loadNewData } = useData()!.functions as any
 
@@ -334,10 +313,6 @@ function Plot(props: { formData: UsePlotVariablesReturnType }) {
         }
     };
 
-    const zoomToDateRange = (dateRange: DateRange) => {
-        setZoomedDateRange(dateRange);
-    };
-
     const resetZoom = () => {
         setZoomedDateRange(null);
         setPanOffset(0); // Reset pan when exiting zoom
@@ -401,6 +376,8 @@ function Plot(props: { formData: UsePlotVariablesReturnType }) {
 
     return (
         <div>
+
+
             {/* Date Selection Controls */}
             <div style={{
                 padding: "10px",
@@ -755,7 +732,7 @@ function Plot(props: { formData: UsePlotVariablesReturnType }) {
                 onMouseLeave={finishDrawingRect}
                 onWheel={handleWheel}
             >
-                <g onClick={loadNewData}>
+                {/* <g onClick={loadNewData}>
                     <rect fill="#333"
                         rx="4" ry="4"
                         style={{ cursor: "pointer" }} x={plotw() + margin.right + margin.left - 4} y={0} width="95" height="25" />
@@ -764,7 +741,7 @@ function Plot(props: { formData: UsePlotVariablesReturnType }) {
                         "font-size": "12px",
                         "font-family": "sans-serif"
                     }} x={plotw() + margin.right + margin.left} y={16}>{refetch.at(2)!() ? 'Load more data' : 'No more data'}</text>
-                </g>
+                </g> */}
 
                 {/* X-axis */}
                 <Xaxis formData={formData}>
@@ -950,7 +927,6 @@ function Plot(props: { formData: UsePlotVariablesReturnType }) {
                     {(item) => <option style={{ cursor: "pointer" }} value={item}>{item}</option>}
                 </For>
             </select>
-
-        </div>
+        </div >
     );
 }
