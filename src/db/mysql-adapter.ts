@@ -1,4 +1,4 @@
-import type { Data, DataPoint } from './../interfaces';
+import type { DataPoint } from './../interfaces';
 import type { AstroIntegration, AstroConfig } from 'astro';
 import mysql from 'mysql2/promise';
 import { formatDate } from '../utils';
@@ -148,8 +148,9 @@ export async function query_full(
   date: Date,
   searchParam: string,
   start: Date,
-  action: string
-): Promise<Data[]> {
+  action: string,
+  idx: number
+): Promise<DataPoint[]> {
   const mysql = new MySQLAdapter();
   const partial = action === Actions.partial
   const full = action === Actions.full
@@ -171,50 +172,48 @@ export async function query_full(
 
     // Normal
     normal: (date = new Date(), rif = new Date()) => `
+    SELECT *, 
+        (${idx} + (ROW_NUMBER() OVER (ORDER BY Date DESC))) AS idx
+FROM (
     SELECT
-        Date as date,
-        COALESCE(VRP, 0) AS close,
-        'MODIS' AS Sensor
-    FROM
-        modis_etna_nrt
-    WHERE
-        VRP IS NOT NULL AND VRP > 0
-        AND VRP <= 100
-        AND Date <= cast('${formatDate(rif)}' as DATE) 
-        AND Date >=  cast('${formatDate(date)}' as DATE)
+        Date AS date,
+        COALESCE(VRP, 0) AS close
+    FROM modis_etna_nrt
+    WHERE VRP IS NOT NULL AND VRP > 0
+      AND VRP <= 100
+      AND Date <= CAST('${formatDate(rif)}' AS DATE)
+      AND Date >= CAST('${formatDate(date)}' AS DATE)
+
     UNION ALL
+
     SELECT
-        Date as date,
-        COALESCE(VRP, 0) AS close,
-        'VIIRS' AS Sensor
-    FROM
-        viirs_etna_nrt
-    WHERE
-        VRP IS NOT NULL AND VRP > 0
-        AND VRP <= 100
-        AND Date <= cast('${formatDate(rif)}' as DATE) 
-        AND Date >=  cast('${formatDate(date)}' as DATE)
+        Date AS date,
+        COALESCE(VRP, 0) AS close
+    FROM viirs_etna_nrt
+    WHERE VRP IS NOT NULL AND VRP > 0
+      AND VRP <= 100
+      AND Date <= CAST('${formatDate(rif)}' AS DATE)
+      AND Date >= CAST('${formatDate(date)}' AS DATE)
+
     UNION ALL
+
     SELECT
-        Date as date,
-        COALESCE(VRP, 0) AS close,
-        'SLSTR' AS Sensor
-    FROM
-        slstr_etna_nrt
-    WHERE
-        VRP IS NOT NULL AND VRP > 0
-        AND VRP <= 100
-        AND Date <= cast('${formatDate(rif)}' as DATE) 
-        AND Date >=  cast('${formatDate(date)}' as DATE)
-    ORDER BY Date DESC;
-        `,
+        Date AS date,
+        COALESCE(VRP, 0) AS close
+    FROM slstr_etna_nrt
+    WHERE VRP IS NOT NULL AND VRP > 0
+      AND VRP <= 100
+      AND Date <= CAST('${formatDate(rif)}' AS DATE)
+      AND Date >= CAST('${formatDate(date)}' AS DATE)
+) t
+ORDER BY t.date ASC;
+    `,
 
     // Watch
     watch: (date = new Date(), rif = new Date()) => `
     SELECT
         Date as date,
-        COALESCE(VRP, 0) AS close,
-        'MODIS' AS Sensor
+        COALESCE(VRP, 0) AS close
     FROM
         modis_etna_nrt
     WHERE
@@ -225,8 +224,7 @@ export async function query_full(
     UNION ALL
     SELECT
         Date as date,
-        COALESCE(VRP, 0) AS close,
-        'VIIRS' AS Sensor
+        COALESCE(VRP, 0) AS close
     FROM
         viirs_etna_nrt
     WHERE
@@ -237,8 +235,7 @@ export async function query_full(
     UNION ALL
     SELECT
         Date as date,
-        COALESCE(VRP, 0) AS close,
-        'SLSTR' AS Sensor
+        COALESCE(VRP, 0) AS close
     FROM
         slstr_etna_nrt
     WHERE
@@ -253,8 +250,7 @@ export async function query_full(
     advisory: (date = new Date(), rif = new Date()) => `
     SELECT
         Date as date,
-        COALESCE(VRP, 0) AS close,
-        'MODIS' AS Sensor
+        COALESCE(VRP, 0) AS close
     FROM
         modis_etna_nrt
     WHERE
@@ -264,8 +260,7 @@ export async function query_full(
     UNION ALL
     SELECT
         Date as date,
-        COALESCE(VRP, 0) AS close,
-        'VIIRS' AS Sensor
+        COALESCE(VRP, 0) AS close
     FROM
         viirs_etna_nrt
     WHERE
@@ -275,8 +270,7 @@ export async function query_full(
     UNION ALL
     SELECT
         Date as date,
-        COALESCE(VRP, 0) AS close,
-        'SLSTR' AS Sensor
+        COALESCE(VRP, 0) AS close
     FROM
         slstr_etna_nrt
     WHERE

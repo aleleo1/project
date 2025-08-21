@@ -1,5 +1,5 @@
 import { batch, createContext, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, useContext } from "solid-js";
-import type { Context, Data, QueryParams } from "../interfaces";
+import type { Context, DataPoint, QueryParams } from "../interfaces";
 import { createQuerySignal, extractStates, formatDate, intervalManager, isRtState, randomizeDifferentNumber, randomizeFutureDate, searchParamsToObject, updateMainURL } from "../utils";
 import { Actions, DEFAULT_INITIAL_STATE } from "../constants";
 const DataContext = createContext<Context>();
@@ -12,17 +12,17 @@ export function DataProvider(props: any) {
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    const data = createResource<Data[]>(refetch.at(2), () => props.data, { initialValue: props.data, deferStream: false })
+    const data = createResource<DataPoint[]>(refetch.at(2), () => props.data, { initialValue: props.data, deferStream: false })
     createEffect(on(href[0], (href) => {
-
-        if (searchParamsToObject(new URL(extractStates(new URL(href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > date()) {
-            window.location.reload()
-        }
-
-        if (extractStates(new URL(href).searchParams).length === 1 && !isRt()) {
-            window.location.href = new URL(href).origin
-        }
-
+        /* 
+                if (searchParamsToObject(new URL(extractStates(new URL(href).searchParams)[props.index]).searchParams.toString(), DEFAULT_INITIAL_STATE).date > date()) {
+                    window.location.reload()
+                }
+        
+                if (extractStates(new URL(href).searchParams).length === 1 && !isRt()) {
+                    window.location.href = new URL(href).origin
+                }
+         */
         history.pushState({}, '', href);
 
     }, { defer: true }))
@@ -40,17 +40,17 @@ export function DataProvider(props: any) {
     createEffect(on(isRt, (val, prev) => {
         if (val) {
             intervalId[1](intervalManager.create(() => {
-                data[1].mutate((prev) => {
+                data[1].mutate((prev: any) => {
                     // Example usage:
                     // Generate a random future date
                     const randomFutureDate = randomizeFutureDate(prev[0].date, 5); // Random date within the next 30 days
                     const randomDifferentNumber = randomizeDifferentNumber(prev[0].close, 1, 100);
-                    console.log('running interval with value: ', { date: randomFutureDate, close: randomDifferentNumber, sensor: 'RANDOM' })
+                    console.log('running interval with value: ', { date: randomFutureDate, close: randomDifferentNumber })
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore
                     refetch[1]({ q: q(), action: action(), data: date(), rif: randomFutureDate })
                     return [
-                        { date: randomFutureDate, close: randomDifferentNumber, sensor: 'RANDOM' }, ...prev]
+                        { date: randomFutureDate, close: randomDifferentNumber }, ...prev]
                 })
             }, 5))
             intervalManager.start(intervalId[0]())

@@ -67,7 +67,7 @@ for (let i = 0; i < state.length; i++) {
   );
   s.action = DEFAULT_INITIAL_STATE.action;
 
-  const result = await query_full(s.date, s.q, s.rif, s.action);
+  const result = await query_full(s.date, s.q, s.rif, s.action, 0);
   containers.push({ state: s, result });
   initialUrl = updateMainURL(
     initialUrl,
@@ -82,6 +82,7 @@ initialUrl = updateMainUrlRt(initialUrl, rt);
 ---
 
 <Layout>
+  <h1 class="flex justify-center font-extrabold text-xl">WIDV npm pkg Preview</h1>
   {!Astro.props.download && 
   (<span
     id="tmpUrl"
@@ -101,7 +102,7 @@ initialUrl = updateMainUrlRt(initialUrl, rt);
   >
     {
       containers.map(({ result, state }, index) => (
-        <div class="h-[700px]">
+        <div class="mb-20">
           <Container
             data={result}
             initialState={state}
