@@ -73,7 +73,6 @@ function ChartContainer(p: any) {
     refetch[1]({ q: q, date: formatDate(d), action: Actions.partial, idx: idx() })
   }
 
-  const loadNewDataWithDate = (prop: keyof QueryParams, value: Date) => refetch[1]({ [prop]: value, action: Actions.full } as any)
   return (
     <div class="flex flex-col">
       <div class="flex sm:flex-row flex-col gap-28 items-center justify-between w-full overflow-hidden m-3 p-3">
