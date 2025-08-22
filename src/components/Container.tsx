@@ -1,5 +1,5 @@
 import { batch, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, Show } from "solid-js";
-import Plot /* { Plot } */ from './Plot'; /* 'solidjs-interactive-plot' */;
+import /* Plot  */{ Plot } from /* './Plot'; */ 'solidjs-interactive-plot';
 import type { DataPoint, QueryParams } from "../interfaces";
 import usePlotVariables from "./utils/plotUtils";
 import { DEFAULT_INITIAL_STATE, Actions } from "../constants";

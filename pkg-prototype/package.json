@@ -1,0 +1,66 @@
+{
+  "name": "solidjs-interactive-plot",
+  "version": "1.0.0",
+  "description": "Interactive data visualization component for SolidJS with zooming, panning, and date selection",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "solidjs",
+    "chart",
+    "visualization",
+    "d3",
+    "interactive",
+    "plot",
+    "zoom",
+    "pan",
+    "date-selection"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "peerDependencies": {
+    "d3-scale": "^4.0.2",
+    "solid-js": "^1.9.5"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.5",
+    "@babel/preset-env": "^7.23.5",
+    "@babel/preset-typescript": "^7.23.3",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.5",
+    "@types/d3": "^7.4.3",
+    "@types/node": "^24.3.0",
+    "babel-preset-solid": "^1.8.4",
+    "rollup": "^4.6.1",
+    "rollup-plugin-dts": "^6.1.0",
+    "tslib": "^2.8.1",
+    "typescript": "^5.2.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/solidjs-interactive-plot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/solidjs-interactive-plot/issues"
+  },
+  "homepage": "https://github.com/yourusername/solidjs-interactive-plot#readme"
+}
