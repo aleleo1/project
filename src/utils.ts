@@ -43,9 +43,12 @@ export const updateUrl = (url: string, params: Partial<QueryParams>) => {
   const newUrl = new URL(url)
   for (let key in params) {
     const value = Object(params)[key]
-    if (value) {
+    if (!!value || value === 0  ) {
       if (typeof value === 'object') {
         newUrl.searchParams.set(key, formatDate(value))
+      }
+      else if (typeof value === 'number') {
+        newUrl.searchParams.set(key, value.toString())
       } else newUrl.searchParams.set(key, value)
     }
   }
@@ -74,21 +77,9 @@ export function searchParamsToObject<T extends Record<string, any>>(
   return result;
 }
 
-export function extractStates(params: URLSearchParams): string[] {
+export function extractState(params: URLSearchParams): string {
   const c = params.get("c")
-  return c ? JSON.parse(decodeURIComponent(c)) : []
-}
-
-export function updateMainURL(main: string, partial: string, index: number) {
-  const mainURL = new URL(main)
-  const states = extractStates(mainURL.searchParams)
-  if (states.length) {
-    states[index] = encodeURIComponent(partial)
-  } else {
-    states.push(encodeURIComponent(partial))
-  }
-  mainURL.searchParams.set('c', JSON.stringify(states))
-  return mainURL.toString()
+  return c ?? ''
 }
 
 export function updateMainUrlRt(main: string, index: number) {
@@ -279,7 +270,7 @@ export function randomizeFutureDate(startDate: Date, maxDaysToAdd: number = 365)
   // Generate a random number of milliseconds to add (between 1ms and maxDaysToAdd days)
   const minMillisecondsToAdd = 1; // At least 1 millisecond later
   const maxMillisecondsToAdd = maxDaysToAdd * 24 * 60 * 60 * 1000;
-831804
+  831804
   // Generate random milliseconds between min and max
   const millisecondsToAdd = Math.floor(
     Math.random() * (maxMillisecondsToAdd - minMillisecondsToAdd + 1) + minMillisecondsToAdd

@@ -20,6 +20,7 @@ export const DEFAULT_INITIAL_STATE: QueryParams = {
     q: Queries.default,
     num: 1,
     rif: get_DEFAULT_DATES()[0],
+    idx: 0,
     action: Actions.full
 }
 

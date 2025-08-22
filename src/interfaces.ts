@@ -28,6 +28,7 @@ export interface QueryParams {
   num: number;
   q: string;
   rif: Date;
+  idx: number;
 }
 export type UrlParams =
   {

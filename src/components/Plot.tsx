@@ -1,4 +1,4 @@
-import { For, Show, batch, createMemo, createSignal, createUniqueId, type Resource } from "solid-js";
+import { For, Show, batch, createEffect, createMemo, createSignal, createUniqueId, type Resource } from "solid-js";
 import { formatDate } from "../utils";
 import type { DataPoint, UsePlotVariablesReturnType } from "../interfaces";
 import Xaxis from "./Xaxis";
@@ -22,9 +22,9 @@ interface DateRange {
 }
 
 
-export default function Plot(props: { formData: UsePlotVariablesReturnType, dataS: Resource<DataPoint[]> }) {
+export default function Plot(props: { formData: UsePlotVariablesReturnType, dataS: Resource<DataPoint[]>, refetch: any, load: () => void }) {
     /*  */
-    const formData = props.formData;
+    const { refetch, load, formData } = props;
     let chartContainer: SVGSVGElement | undefined;
 
     // RECTANGLE DRAWING STATE
@@ -56,7 +56,7 @@ export default function Plot(props: { formData: UsePlotVariablesReturnType, data
     const margin = { top: 40, right: 40, bottom: 40, left: 100 };
     const da = createSignal<DataPoint | undefined>(undefined)
 
-
+    createEffect(() => console.log(da[0]()))
     // STRINGS
     const id = createUniqueId()
 
@@ -499,7 +499,7 @@ export default function Plot(props: { formData: UsePlotVariablesReturnType, data
                 </span>
 
                 <span style={{ "font-size": "12px", color: "#64748b" }}>
-                    Elemento selezionato: {da[0]() && da[0]()!.date.toLocaleDateString() + ' --- ' + da[0]()!.close}
+                    Elemento selezionato: {da[0]() && da[0]()!.date && new Date(da[0]()!.date).toLocaleDateString() + ' --- ' + da[0]()!.close}
                 </span>
             </div>
 
@@ -732,7 +732,7 @@ export default function Plot(props: { formData: UsePlotVariablesReturnType, data
                 onMouseLeave={finishDrawingRect}
                 onWheel={handleWheel}
             >
-                {/* <g onClick={loadNewData}>
+                <g onClick={load}>
                     <rect fill="#333"
                         rx="4" ry="4"
                         style={{ cursor: "pointer" }} x={plotw() + margin.right + margin.left - 4} y={0} width="95" height="25" />
@@ -741,7 +741,7 @@ export default function Plot(props: { formData: UsePlotVariablesReturnType, data
                         "font-size": "12px",
                         "font-family": "sans-serif"
                     }} x={plotw() + margin.right + margin.left} y={16}>{refetch.at(2)!() ? 'Load more data' : 'No more data'}</text>
-                </g> */}
+                </g>
 
                 {/* X-axis */}
                 <Xaxis formData={formData}>

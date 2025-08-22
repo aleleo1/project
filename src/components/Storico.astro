@@ -6,10 +6,8 @@ import { type ContainerData } from "../interfaces";
 import {
   updateUrl,
   searchParamsToObject,
-  extractStates,
-  updateMainURL,
-  updateMainUrlRt,
   getDeviceDetails,
+  extractState
 } from "../utils";
 import Layout from "../layouts/Layout.astro";
 import Download from "./Download.astro";
@@ -19,66 +17,32 @@ interface Props {
 const mainUrl = new URL(Astro.request.url);
 const userAgent = Astro.request.headers.get("user-agent")!;
 const defaultWidth = getDeviceDetails(userAgent).isDesktop ? 1920 : 620;
-let rt = -1;
 const params = mainUrl.searchParams;
-const containers: Array<ContainerData> = [];
-let c = params.get("c");
-let state: string[] = [];
+let container: ContainerData = null;
+let state: URL = new URL(mainUrl);
 let initialUrl = mainUrl.origin;
 
-if (!c) {
-  const defaultState = { ...DEFAULT_INITIAL_STATE };
-  defaultState.q = Queries.default;
-
+if ([...params].length > 0) {
   const normalState = { ...DEFAULT_INITIAL_STATE };
   normalState.q = Queries.normal;
-
-  const watchState = { ...DEFAULT_INITIAL_STATE };
-  watchState.q = Queries.watch;
-
-  const advisoryState = { ...DEFAULT_INITIAL_STATE };
-  advisoryState.q = Queries.advisory;
-
-  const volcanicCloudsTrackingState = { ...DEFAULT_INITIAL_STATE };
-  volcanicCloudsTrackingState.q = Queries.volcanicCloudsTracking;
-
-  const eruptionClassificationState = { ...DEFAULT_INITIAL_STATE };
-  eruptionClassificationState.q = Queries.eruptionClassification;
-
-  state = [
-    //updateUrl(mainUrl.origin, defaultState).toString(),
-    updateUrl(mainUrl.origin, normalState).toString(),
-    updateUrl(mainUrl.origin, watchState).toString(),
-    updateUrl(mainUrl.origin, advisoryState).toString(),
-    //problematiche:
-    //updateUrl(mainUrl.origin, volcanicCloudsTrackingState).toString(),
-    //updateUrl(mainUrl.origin, eruptionClassificationState).toString(),
-  ];
+  state =  updateUrl(mainUrl.origin, normalState);
 } else {
-  rt = mainUrl.searchParams.get("rt")
-    ? Number(mainUrl.searchParams.get("rt"))
-    : -1;
-  state = extractStates(params);
+  state = mainUrl
 }
-for (let i = 0; i < state.length; i++) {
-  const s = searchParamsToObject(
-    new URL(state[i]).searchParams.toString(),
-    DEFAULT_INITIAL_STATE,
-  );
-  s.action = DEFAULT_INITIAL_STATE.action;
 
-  const result = await query_full(s.date, s.q, s.rif, s.action, 0);
-  containers.push({ state: s, result });
-  initialUrl = updateMainURL(
-    initialUrl,
-    updateUrl(mainUrl.origin, s).toString(),
-    i,
-  );
-}
-if (rt > 0 && containers.length === 1) {
-  rt = 0;
-}
-initialUrl = updateMainUrlRt(initialUrl, rt);
+const s = searchParamsToObject(
+  new URL(state).searchParams.toString(),
+  DEFAULT_INITIAL_STATE
+
+);
+s.idx = DEFAULT_INITIAL_STATE.idx
+
+s.action = DEFAULT_INITIAL_STATE.action;
+
+const result = await query_full(s.date, s.q, s.rif, s.action, s.idx);
+container = { state: s, result };
+initialUrl = updateUrl(mainUrl.origin, s).toString()
+console.log(initialUrl, s.idx)
 ---
 
 <Layout>
@@ -100,22 +64,17 @@ initialUrl = updateMainUrlRt(initialUrl, rt);
     id="content-container"
     class="flex flex-col justify-center align-middle gap-y-2.5"
   >
-    {
-      containers.map(({ result, state }, index) => (
         <div class="mb-20">
           <Container
             data={result}
-            initialState={state}
-            url={updateUrl(mainUrl.origin, state).toString()}
-            index={index}
+            initialState={container.state}
+            url={updateUrl(mainUrl.origin, container.state).toString()}
             dw={defaultWidth}
             tmpUrl={initialUrl}
             client:visible
             download={Astro.props.download}
           />
         </div>
-      ))
-    }
   </div>
 </Layout>
 <style is:global>
