@@ -1,5 +1,5 @@
 import { batch, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, Show } from "solid-js";
-import Plot from "./Plot";
+import Plot /* { Plot } */ from './Plot'; /* 'solidjs-interactive-plot' */;
 import type { DataPoint, QueryParams } from "../interfaces";
 import usePlotVariables from "./utils/plotUtils";
 import { DEFAULT_INITIAL_STATE, Actions } from "../constants";
@@ -22,7 +22,6 @@ function ChartContainer(p: any) {
   const idx = () => data[0]()!.at(0)!.idx
   const rif = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).rif)
   const date = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).date)
-  const q = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).q)
   const action = createMemo(() => searchParamsToObject(new URL(refetch[0]()).searchParams.toString(), DEFAULT_INITIAL_STATE).action)
 
   const intervalId = createSignal('')

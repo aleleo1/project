@@ -14,6 +14,7 @@ import Download from "./Download.astro";
 interface Props {
   download: number;
 }
+
 const mainUrl = new URL(Astro.request.url);
 const userAgent = Astro.request.headers.get("user-agent")!;
 const defaultWidth = getDeviceDetails(userAgent).isDesktop ? 1920 : 620;
@@ -22,11 +23,11 @@ let state: URL = new URL(mainUrl);
 let initialUrl = mainUrl.origin;
 
 if ([...params].length > 0) {
-  const normalState = { ...DEFAULT_INITIAL_STATE };
-  normalState.q = Queries.normal;
-  state =  updateUrl(mainUrl.origin, normalState);
-} else {
   state = mainUrl
+  
+} else {
+  const normalState = { ...DEFAULT_INITIAL_STATE };
+  state =  updateUrl(mainUrl.origin, normalState);
 }
 
 const s = searchParamsToObject(
@@ -38,10 +39,9 @@ s.idx = DEFAULT_INITIAL_STATE.idx
 
 s.action = DEFAULT_INITIAL_STATE.action;
 
-const result = await query_full(s.date, s.q, s.rif, s.action, s.idx);
+const result = await query_full(s.date, s.rif, s.action, s.idx);
 const container = { state: s, result };
 initialUrl = updateUrl(mainUrl.origin, s).toString()
-console.log(initialUrl, s.idx)
 ---
 
 <Layout>

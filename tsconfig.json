@@ -3,7 +3,7 @@
   "include": [
     ".astro/types.d.ts",
     "**/*"
-  ],
+, "../pkg-prototype"  ],
   "exclude": [
     "dist"
   ],

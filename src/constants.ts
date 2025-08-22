@@ -17,7 +17,6 @@ export enum Queries {
 
 export const DEFAULT_INITIAL_STATE: QueryParams = {
     date: get_DEFAULT_DATES()[1],
-    q: Queries.default,
     num: 1,
     rif: get_DEFAULT_DATES()[0],
     idx: 0,

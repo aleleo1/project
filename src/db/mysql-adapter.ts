@@ -146,7 +146,6 @@ export async function query(date: Date, searchParam: string, rif: Date, full = f
 
 export async function query_full(
   date: Date,
-  searchParam: string,
   start: Date,
   action: string,
   idx: number
@@ -164,9 +163,7 @@ export async function query_full(
     rif = start
   }
   // Define queries object
-  const queries: { [key: string]: (date?: Date, rif?: Date) => string } = {
-
-    normal: (date = new Date(), rif = new Date()) => `
+  const normal = (date = new Date(), rif = new Date()) => `
     SELECT *, 
         (${idx} + (ROW_NUMBER() OVER (ORDER BY Date DESC))) AS idx
 FROM (
@@ -203,15 +200,9 @@ FROM (
 ) t
 ORDER BY t.date ASC;
     `
-  };
 
-  // Execute the query based on searchParam
-  let queryToExecute = queries[searchParam];
-  if (!queryToExecute) {
-    throw new Error(`Invalid search parameter: ${searchParam}`);
-  }
 
-  const data: any[] = await mysql.query(queryToExecute(date, rif));
+  const data: any[] = await mysql.query(normal(date, rif));
   return data;
 }
 

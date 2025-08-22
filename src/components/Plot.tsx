@@ -1,26 +1,8 @@
 import { For, Show, batch, createEffect, createMemo, createSignal, createUniqueId, type Resource } from "solid-js";
 import { formatDate } from "../utils";
-import type { DataPoint, UsePlotVariablesReturnType } from "../interfaces";
+import type { DataPoint, UsePlotVariablesReturnType, DateRange, Rectangle } from "../interfaces";
 import Xaxis from "./Xaxis";
 import { scaleUtc, scaleLinear } from 'd3-scale';
-
-interface Rectangle {
-    id: string;
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-    fill: string;
-    stroke: string;
-    opacity: number;
-}
-
-interface DateRange {
-    startDate: Date;
-    endDate: Date;
-    dataPoints: any[];
-}
-
 
 export default function Plot(props: { formData: UsePlotVariablesReturnType, dataS: Resource<DataPoint[]>, refetch: any, load: () => void }) {
     /*  */

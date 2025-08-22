@@ -43,7 +43,7 @@ export const updateUrl = (url: string, params: Partial<QueryParams>) => {
   const newUrl = new URL(url)
   for (let key in params) {
     const value = Object(params)[key]
-    if (!!value || value === 0  ) {
+    if (!!value || value === 0) {
       if (typeof value === 'object') {
         newUrl.searchParams.set(key, formatDate(value))
       }

@@ -26,7 +26,6 @@ export interface QueryParams {
   action: string;
   date: Date;
   num: number;
-  q: string;
   rif: Date;
   idx: number;
 }
@@ -170,4 +169,20 @@ export interface UsePlotVariablesReturnType {
     height: number;
     tickCount: number;
   };
+}
+export interface Rectangle {
+    id: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fill: string;
+    stroke: string;
+    opacity: number;
+}
+
+export interface DateRange {
+    startDate: Date;
+    endDate: Date;
+    dataPoints: any[];
 }
