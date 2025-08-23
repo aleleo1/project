@@ -26,15 +26,9 @@ export interface QueryParams {
   action: string;
   date: Date;
   num: number;
-  q: string;
   rif: Date;
   idx: number;
 }
-export type UrlParams =
-  {
-    c: QueryParams[]
-  }
-
 
 export type ContainerData = { result: DataPoint[], state: QueryParams }
 

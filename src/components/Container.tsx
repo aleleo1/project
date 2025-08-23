@@ -1,12 +1,11 @@
 import { batch, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, Show } from "solid-js";
-import /* Plot  */{ Plot } from /* './Plot'; */ 'solidjs-interactive-plot';
-import type { DataPoint, QueryParams } from "../interfaces";
-import usePlotVariables from "./utils/plotUtils";
+import /* Plot  */ { WidvPlot } from /* './Plot'; */ 'widv-plot';
+import { UsePlotVariables, type DataPoint, type QueryParams } from "solidjs-interactive-plot";
 import { DEFAULT_INITIAL_STATE, Actions } from "../constants";
 import { createQuerySignal, isRtState, searchParamsToObject, intervalManager, randomizeFutureDate, randomizeDifferentNumber, formatDate } from "../utils";
 
 function ChartContainer(p: any) {
-  const vars = usePlotVariables()
+  const vars = UsePlotVariables()
   const refetch = createQuerySignal(p.url);
 
   const href = createSignal(p.initialUrl)
@@ -77,7 +76,7 @@ function ChartContainer(p: any) {
       <div class="flex sm:flex-row flex-col gap-28 items-center justify-between w-full overflow-hidden m-3 p-3">
         <Show when={!data[0].error && data[0]()!.length}>
           <div class="flex flex-col">
-            <Plot formData={vars} dataS={data[0]} load={loadNewData} refetch={refetch}></Plot>
+            <WidvPlot formData={vars} dataS={data[0]} load={loadNewData} refetch={refetch}></WidvPlot>
           </div>
         </Show>
       </div>

@@ -17,7 +17,7 @@
     "d3-scale": "^4.0.2",
     "mysql2": "^3.14.0",
     "solid-js": "^1.9.9",
-    "solidjs-interactive-plot": "file:pkg-prototype/solidjs-interactive-plot-1.0.0.tgz",
+    "widv-plot": "file:pkg-prototype/widv-plot-1.0.0.tgz",
     "tailwindcss": "^4.0.9"
   },
   "devDependencies": {

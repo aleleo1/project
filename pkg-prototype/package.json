@@ -1,5 +1,5 @@
 {
-  "name": "solidjs-interactive-plot",
+  "name": "widv-plot",
   "version": "1.0.0",
   "description": "Interactive data visualization component for SolidJS with zooming, panning, and date selection",
   "type": "module",

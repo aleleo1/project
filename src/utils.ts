@@ -1,5 +1,5 @@
 import { type Signal, createSignal } from "solid-js";
-import type { QueryParams } from "./interfaces";
+import type { QueryParams } from "solidjs-interactive-plot";
 const DEFAULT_RIF = new Date()
 
 export const get_DEFAULT_DATES = () => {

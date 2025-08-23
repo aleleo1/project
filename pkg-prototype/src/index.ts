@@ -1,10 +1,9 @@
-export { default as Plot } from './Plot';
+export { default as WidvPlot } from './Plot';
 export type {
     DataPoint,
     MySQLAdapterConfig,
     Stato,
     QueryParams,
-    UrlParams,
     ContainerData,
     Context,
     UsePlotVariablesOptions,
@@ -12,4 +11,4 @@ export type {
     Rectangle,
     DateRange
 } from './types';
-export { default as PlotProps } from "./utils";
+export { default as UsePlotVariables } from "./utils";
