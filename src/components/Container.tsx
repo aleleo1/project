@@ -1,6 +1,6 @@
 import { batch, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, Show } from "solid-js";
 import /* Plot  */ { WidvPlot } from /* './Plot'; */ 'widv-plot';
-import { UsePlotVariables, type DataPoint, type QueryParams } from "solidjs-interactive-plot";
+import { UsePlotVariables, type DataPoint, type QueryParams } from "widv-plot";
 import { DEFAULT_INITIAL_STATE, Actions } from "../constants";
 import { createQuerySignal, isRtState, searchParamsToObject, intervalManager, randomizeFutureDate, randomizeDifferentNumber, formatDate } from "../utils";
 
@@ -34,7 +34,6 @@ function ChartContainer(p: any) {
   createEffect(on(refetch[0], fetchData, { defer: true }))
   async function fetchData() {
     batch(async () => {
-      console.log('fetching data...', refetch[0]())
       const fetchUrl = new URL(refetch[0]())
       fetchUrl.pathname = '/api/data'
       const response = await fetch(fetchUrl, {
@@ -48,14 +47,12 @@ function ChartContainer(p: any) {
       }
       const d = await response.json()
       if (d.length === 0) {
-        console.log('nothing else')
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         refetch.at(3)!(false)
       } else {
         data[1].mutate((prev) => action() === Actions.partial ? [...d, ...prev] : [...d]);
       }
-      console.log(`fetched ${d.length} elements, new data length of ${data[0]().length}`)
       href[1](refetch.at(0)!())
     })
   }

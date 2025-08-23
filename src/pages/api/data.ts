@@ -9,7 +9,7 @@ export const GET: APIRoute = async (req) => {
     const rif = new Date(params.get('rif')!)
     const action = params.get('action')!
     const idx = Number(params.get('idx')) ?? 0
-    const result = (await query_full(date, q!, rif, action, idx))
+    const result = (await query_full(date, rif, action, idx))
     return new Response(JSON.stringify(result), {
       status: 200,
       headers: {

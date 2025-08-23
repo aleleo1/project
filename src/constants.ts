@@ -1,4 +1,4 @@
-import { type QueryParams } from "solidjs-interactive-plot";
+import { type QueryParams } from "widv-plot";
 import { get_DEFAULT_DATES } from "./utils";
 
 export enum Actions {

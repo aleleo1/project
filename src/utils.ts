@@ -1,5 +1,5 @@
 import { type Signal, createSignal } from "solid-js";
-import type { QueryParams } from "solidjs-interactive-plot";
+import type { QueryParams } from "widv-plot";
 const DEFAULT_RIF = new Date()
 
 export const get_DEFAULT_DATES = () => {

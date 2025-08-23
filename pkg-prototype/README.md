@@ -14,7 +14,7 @@ Features
 Installation
 bash
 
-npm install solidjs-interactive-plot
+npm install widv-plot
 
 Peer Dependencies
 
@@ -26,7 +26,7 @@ npm install solid-js d3
 Basic Usage
 tsx
 
-import { InteractivePlot, createDefaultFormData, generateSampleData } from 'solidjs-interactive-plot';
+import { InteractivePlot, createDefaultFormData, generateSampleData } from 'widv-plot';
 
 function App() {
   const formData = createDefaultFormData();
@@ -46,7 +46,7 @@ function App() {
 Advanced Usage
 tsx
 
-import { InteractivePlot } from 'solidjs-interactive-plot';
+import { InteractivePlot } from 'widv-plot';
 import { createSignal } from 'solid-js';
 
 function AdvancedChart() {

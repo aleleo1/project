@@ -1,4 +1,4 @@
-import type { DataPoint } from './../interfaces';
+import type { DataPoint } from 'widv-plot';
 import type { AstroIntegration, AstroConfig } from 'astro';
 import mysql from 'mysql2/promise';
 import { formatDate } from '../utils';

@@ -1,4 +1,4 @@
-import { For, Show, batch, createEffect, createMemo, createSignal, createUniqueId, type Resource } from "solid-js";
+import { For, Show, batch, createMemo, createSignal, createUniqueId, type Resource } from "solid-js";
 import type { DataPoint, UsePlotVariablesReturnType, DateRange, Rectangle } from "./types";
 import Xaxis from "./Xaxis";
 import { scaleUtc, scaleLinear } from 'd3-scale';
@@ -38,7 +38,6 @@ export default function Plot(props: { formData: UsePlotVariablesReturnType, data
     const margin = { top: 40, right: 40, bottom: 40, left: 100 };
     const da = createSignal<DataPoint | undefined>(undefined)
 
-    createEffect(() => console.log(da[0]()))
     // STRINGS
     const id = createUniqueId()
 
