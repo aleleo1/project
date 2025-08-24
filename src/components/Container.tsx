@@ -1,8 +1,8 @@
 import { batch, createEffect, createMemo, createResource, createSignal, on, onCleanup, onMount, Show } from "solid-js";
 import /* Plot  */ { WidvPlot } from /* './Plot'; */ 'widv-plot';
-import { UsePlotVariables, type DataPoint, type QueryParams } from "widv-plot";
+import { UsePlotVariables, type DataPoint } from "widv-plot";
 import { DEFAULT_INITIAL_STATE, Actions } from "../constants";
-import { createQuerySignal, isRtState, searchParamsToObject, intervalManager, randomizeFutureDate, randomizeDifferentNumber, formatDate } from "../utils";
+import { createQuerySignal, isRtState, searchParamsToObject, intervalManager, type QueryParams, formatDate } from "../utils";
 
 function ChartContainer(p: any) {
   const vars = UsePlotVariables()

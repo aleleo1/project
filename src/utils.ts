@@ -1,7 +1,13 @@
 import { type Signal, createSignal } from "solid-js";
-import type { QueryParams } from "widv-plot";
-const DEFAULT_RIF = new Date()
 
+
+export interface QueryParams {
+  action: string;
+  date: Date;
+  num: number;
+  rif: Date;
+  idx: number;
+}
 export const get_DEFAULT_DATES = () => {
   const ACTUAL_DATE = new Date()
   const ACTUAL_DATE_MINUS_6 = new Date()

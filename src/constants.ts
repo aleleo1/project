@@ -1,5 +1,4 @@
-import { type QueryParams } from "widv-plot";
-import { get_DEFAULT_DATES } from "./utils";
+import { get_DEFAULT_DATES ,type QueryParams } from "./utils";
 
 export enum Actions {
     full = 'f',

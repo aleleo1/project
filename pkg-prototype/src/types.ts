@@ -1,41 +1,8 @@
-import type { Signal, ResourceReturn, Accessor, InitializedResourceReturn } from "solid-js";
-
-
 export interface DataPoint {
   date: Date;
   close: number;
   idx: number;
 }
-
-export interface MySQLAdapterConfig {
-  host?: string;
-  user?: string;
-  password?: string;
-  database?: string;
-  port?: number;
-  connectionLimit?: number;
-}
-
-export interface Stato {
-  full?: boolean;
-
-}
-
-
-export interface QueryParams {
-  action: string;
-  date: Date;
-  num: number;
-  rif: Date;
-  idx: number;
-}
-
-export type ContainerData = { result: DataPoint[], state: QueryParams }
-
-export type Context = Partial<{ signals: { [key: string]: Signal<any> }, data: { [key: string]: ResourceReturn<DataPoint[]> }, functions: { [key: string]: () => any }, accessors: { [key: string]: Accessor<any> }, constants: { [key: string]: any } }>
-
-
-
 
 /**
  * @interface UsePlotVariablesOptions
