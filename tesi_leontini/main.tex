@@ -1,0 +1,73 @@
+\documentclass[12pt,a4paper,oneside,openright,titlepage]{book}
+\usepackage[english,italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amsmath} 
+\usepackage{amssymb}
+\usepackage{longtable}
+\usepackage{fancyhdr}
+\usepackage{xparse}
+\newcommand{\fncyblank}{\fancyhf{}}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{xstring,xifthen}
+\usepackage{hyperref,url}
+\usepackage{soulutf8}
+
+\def \ifempty#1{\def\temp{#1} \ifx\temp\empty }
+\def \checkempty#1{ \ifempty{#1} ~ \else #1 \fi }
+
+\newcommand{\setDipartimento}[1]{\newcommand{\dipartimento}{\checkempty{#1}}}
+\newcommand{\setCorsoDiLaurea}[1]{\newcommand{\corsoDiLaurea}{\checkempty{#1}}}
+\newcommand{\setTitolo}[1]{\newcommand{\titolo}{\checkempty{#1}}}
+\newcommand{\setAnno}[1]{\newcommand{\anno}{#1}}
+\newcommand{\setCandidato}[1]{\newcommand{\candidato}{#1}}
+\newcommand{\setRelatore}[1]{\newcommand{\relatore}{#1}}
+\newcommand{\setCorrelatore}[1]{\newcommand{\correlatore}{#1}}
+\newcommand{\setLingua}[1]{\newcommand{\lingua}{#1}}
+\newcommand{\setNomeBibliografia}[1]{\newcommand{\nomeBibliografia}{#1}}
+\newcommand{\setSpazioSopraTitolo}[1]{\newcommand{\spazioSopraTitolo}{#1}}
+\newcommand{\setSpazioSottoTitolo}[1]{\newcommand{\spazioSottoTitolo}{#1}}
+\newcommand{\setSpazioSopraAnno}[1]{\newcommand{\spazioSopraAnno}{#1}}
+\newcommand{\sommario}{}
+\newcommand{\showSommario}{\renewcommand{\sommario}{y}}
+\newcommand{\dedica}{}
+\newcommand{\showDedica}{\renewcommand{\dedica}{y}}
+\newcommand{\ringraziamenti}{}
+\newcommand{\showRingraziamenti}{\renewcommand{\ringraziamenti}{y}}
+\input{config}
+
+\pagestyle{fancy}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\renewcommand{\subsectionmark}[1]{\markright{\thesubsection\ #1}}
+\addto{\captionsenglish}{\renewcommand{\bibname}{\nomeBibliografia}}
+\addto{\captionsitalian}{\renewcommand{\bibname}{\nomeBibliografia}}
+\fancyhf{}
+\lhead{\nouppercase{\rightmark}}
+\chead{}
+\rhead{\bfseries\thepage}
+\fancypagestyle{plain}{\fancyhead{}\renewcommand{\headrulewidth}{0pt}}
+\begin{document}
+\setlength{\baselineskip}{2.0\baselineskip}
+\setlength{\headheight}{15pt}
+\frontmatter
+\input{sections/frontespizio}
+\addtolength{\oddsidemargin}{+1,3cm}
+\StrLen{\dedica}[\dedicaLen]%
+\ifthenelse{\dedicaLen > 0}{\input{sections/dedica}}{}
+\addtocounter{tocdepth}{+1}
+\newpage
+\StrLen{\sommario}[\sommarioLen]%
+\ifthenelse{\sommarioLen > 0}{\input{sections/abstract}}{}
+\expandafter\selectlanguage\expandafter{\lingua}
+\tableofcontents
+\mainmatter
+\input{sections.tex}
+\backmatter
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\bibliographystyle{plain}
+\bibliography{biblio.bib}
+\StrLen{\ringraziamenti}[\ringraziamentiLen]%
+\ifthenelse{\ringraziamentiLen > 0}{\input{sections/ringraziamenti}}{}
+\cite{esempio_citazione}
+\end{document}

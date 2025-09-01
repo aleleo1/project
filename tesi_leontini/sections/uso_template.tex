@@ -1,0 +1,17 @@
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\chapter{Uso del presente template}
+\label{chap:uso_template}
+
+\section{File di configurazione: \texttt{config.tex}}
+
+Il file di configurazione \texttt{config.tex} permette di definire alcuni metadati che verranno visualizzati nel frontespizio (ad es., dipartimento, corso di laurea, titolo della tesi) e di abilitare o disabilitare la visualizzazione di sezioni specifiche: il sommario (necessario nella stesura finale della tesi), la dedica e i ringraziamenti (opzionali).
+
+\section{Sezioni del documento: \texttt{sections.tex}}
+
+Il file \texttt{sections.tex} rappresenta un unico punto di inclusione dei file sorgenti che costituiscono i capitoli della tesi, che dovrebbero essere creati all'interno della cartella \texttt{sections} (un file per capitolo). Il contenuto di default di questo file include le sezioni relative alla modalità di richiesta e svolgimento della tesi. Durante la stesura, le sezioni di default dovrebbero essere commentate e sostituite con i capitoli effettivi della tesi.
+
+I nomi dei capitoli dovrebbero essere costituiti da parole (in minuscolo) concatenate da underscore (``\_''): ad es., \texttt{introduzione.tex} e \texttt{stato\_arte.tex}.
+
+\section{Sezioni predefinite}
+
+La cartella \texttt{sections} contiene di default i file relativi al sommario (\texttt{abstract.tex}), alla dedica (\texttt{dedica.tex}) e ai ringraziamenti (\texttt{ringraziamenti.tex}), il cui utilizzo è abilitato tramite le opzioni apposite in \texttt{config.tex}. Questi file possono essere liberamente modificati ma non dovrebbero essere rinominati.

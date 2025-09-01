@@ -1,0 +1,33 @@
+\clearpage{\pagestyle{empty}\cleardoublepage}
+\chapter{Soluzione Proposta}
+\label{chap:soluzione_proposta}
+
+\section{Architettura}
+
+L'applicazione è composta da:
+\begin{itemize}
+    \item \textbf{Frontend}: Astro + SolidJS, con componenti come \texttt{Container}, \texttt{Download}, e \texttt{Storico}.
+    \item \textbf{Visualizzazione}: \texttt{widv-plot}, che implementa zoom, pan, selezione intervalli e supporta diversi tipi di grafici.
+    \item \textbf{Backend}: Node.js con MySQL, gestito tramite \texttt{mysql-adapter}.
+\end{itemize}
+
+\section{Gestione dello stato}
+
+Lo stato dell'applicazione (filtri, intervalli, visualizzazione) è codificato nell'URL tramite funzioni come \texttt{createQuerySignal} e \texttt{updateUrl}, permettendo la condivisione e il ripristino delle analisi.
+
+\section{Esportazione}
+
+La funzione di esportazione genera file HTML standalone, facilitando la condivisione dei risultati.
+
+\section{Esempi di codice}
+
+\begin{lstlisting}[language=TypeScript]
+export const get_DEFAULT_DATES = () => {
+  const ACTUAL_DATE = new Date()
+  const ACTUAL_DATE_MINUS_6 = new Date()
+  ACTUAL_DATE_MINUS_6.setMonth(ACTUAL_DATE_MINUS_6.getMonth() - 6)
+  const ACTUAL_DATE_MINUS_YEAR = new Date()
+  ACTUAL_DATE_MINUS_YEAR.setFullYear(ACTUAL_DATE_MINUS_YEAR.getFullYear() - 1)
+  return [ACTUAL_DATE_MINUS_6, ACTUAL_DATE_MINUS_YEAR]
+}
+\end{lstlisting}

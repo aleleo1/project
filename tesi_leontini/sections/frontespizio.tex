@@ -1,0 +1,40 @@
+%\newgeometry{margin=1in}
+\begin{titlepage}
+\begin{center}
+% Intestazione
+\begin{minipage}[]{0.4\textwidth}%
+\includegraphics[width=0.7\textwidth]{figures/logo_unict.png}%
+\end{minipage}%
+\begin{minipage}[]{0.45\textwidth}%
+\huge\textbf{UNIVERSIT\`A\\degli STUDI\\di CATANIA}\par%
+\end{minipage}\\
+\vspace{0.8cm}
+{\large\checkempty{\dipartimento}}\\
+\vspace{0.25cm}
+{\large\textbf{\corsoDiLaurea}}\\
+\hbox to \textwidth{\hrulefill}
+\vspace{\spazioSopraTitolo}
+\textbf{\huge\titolo}\\
+\vspace{\spazioSottoTitolo}
+\begin{minipage}{\textwidth}
+\begin{flushright}
+\begin{minipage}{0.3\textwidth}
+{\large\begin{tabbing}%
+\StrLen{\candidato}[\candidatoLen]%
+\ifthenelse{\candidatoLen > 0}{Candidato:\=~~\candidato\\\vspace{1cm}}{}%
+\StrLen{\relatore}[\relatoreLen]%
+\ifthenelse{\relatoreLen > 0}{Relatore:\>~~\relatore\\\vspace{0.5cm}}{}%
+\StrLen{\correlatore}[\correlatoreLen]%
+\ifthenelse{\correlatoreLen > 0}{Correlatore:\>~~\correlatore\\}{}
+\end{tabbing}
+}
+\end{minipage}
+\end{flushright}
+\end{minipage}\\
+\vspace{\spazioSopraAnno} % Modificare questo spazio se necessario
+\hbox to \textwidth{\hrulefill}\vspace{-0.2cm}
+{\large \sc Anno Accademico \anno}
+\end{center}
+\end{titlepage}
+\endinput
+%\restoregeometry
