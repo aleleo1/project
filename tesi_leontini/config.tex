@@ -8,8 +8,13 @@
 \setRelatore{Simone Palazzo}
 \setCorrelatore{}
 \setLingua{italian} % impostare a 'italian' o 'english'
-\setNomeBibliografia{Esempio bibliografia}
 
+% Nome della bibliografia
+\setNomeBibliografia{Bibliografia}
+
+% (Optional) For explicit language support
+\addto\captionsitalian{\renewcommand{\bibname}{Bibliografia}}
+\addto\captionsenglish{\renewcommand{\bibname}{Bibliography}}
 % Spazi nel frontespizio
 \setSpazioSopraTitolo{0.8cm}
 \setSpazioSottoTitolo{2.5cm}

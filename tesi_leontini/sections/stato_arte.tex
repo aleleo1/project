@@ -94,6 +94,70 @@ Highcharts Cloud è una piattaforma SaaS che permette di creare, personalizzare 
 \textbf{Differenze rispetto alla soluzione proposta:}
 La piattaforma sviluppata in questa tesi consente una piena integrazione con flussi dati personalizzati e la gestione avanzata dello stato tramite URL, offrendo maggiore flessibilità e possibilità di estensione.
 
+\section{Soluzioni open source e framework moderni}
+
+Negli ultimi anni, il panorama delle tecnologie per la visualizzazione di dati scientifici e ingegneristici si è notevolmente ampliato. Oltre a piattaforme consolidate come Grafana e Kibana, sono emersi numerosi framework e librerie che offrono funzionalità avanzate, maggiore flessibilità e una migliore integrazione con stack moderni basati su JavaScript e TypeScript.
+
+\subsection{Librerie JavaScript per la visualizzazione dati}
+
+Tra le librerie più diffuse per la visualizzazione di dati in ambiente web si annoverano D3.js, Chart.js, Plotly.js e ECharts. Ognuna di queste soluzioni presenta punti di forza e limiti specifici:
+
+\begin{itemize}
+    \item \textbf{D3.js}: offre un controllo totale sul DOM e sulle transizioni, risultando ideale per visualizzazioni personalizzate e interattive. Tuttavia, la sua curva di apprendimento è piuttosto ripida e richiede una buona conoscenza di JavaScript e dei principi di manipolazione del DOM.
+    \item \textbf{Chart.js}: fornisce un set di grafici predefiniti di facile utilizzo, ma risulta meno flessibile per esigenze avanzate o personalizzazioni spinte.
+    \item \textbf{Plotly.js}: consente la creazione di grafici interattivi e supporta un'ampia gamma di tipologie, ma può risultare pesante in termini di bundle size e meno adatto a integrazioni con framework reattivi moderni.
+    \item \textbf{ECharts}: molto popolare in ambito asiatico, offre ottime performance e una vasta gamma di visualizzazioni, ma la documentazione in inglese è talvolta lacunosa.
+\end{itemize}
+
+Nel progetto descritto in questa tesi, la scelta è ricaduta su D3.js per la sua flessibilità e per la possibilità di integrarlo in modo sinergico con SolidJS, come illustrato nel branch \texttt{pkg}.
+
+\subsection{Framework reattivi e architetture moderne}
+
+L'evoluzione dei framework JavaScript ha portato alla diffusione di soluzioni come React, Vue, Svelte e SolidJS. Questi framework permettono di costruire interfacce utente altamente reattive e modulari, facilitando la gestione dello stato e l'integrazione di componenti complessi come i grafici interattivi.
+
+Nel branch \texttt{pkg} del progetto, SolidJS è stato scelto per la sua reattività fine-grained e per la facilità di integrazione con D3.js. Questo consente di ottenere aggiornamenti immediati dell'interfaccia in risposta a cambiamenti di stato, come la selezione di intervalli temporali o l'applicazione di filtri.
+
+\section{Gestione dello stato e condivisione delle visualizzazioni}
+
+Un limite comune delle soluzioni tradizionali è la difficoltà nel condividere esattamente lo stato di una visualizzazione (filtri, intervalli, configurazioni) tra diversi utenti o sessioni. Molte piattaforme, come Grafana e Kibana, offrono funzionalità di salvataggio delle dashboard, ma spesso la serializzazione dello stato non è trasparente o facilmente esportabile.
+
+Nel progetto sviluppato nel branch \texttt{pkg}, la gestione dello stato tramite encoding nell'URL rappresenta un'innovazione significativa. Funzioni come \texttt{createQuerySignal} e \texttt{updateUrl} permettono di serializzare tutte le configurazioni rilevanti direttamente nell'indirizzo della pagina, facilitando la condivisione e la riproducibilità delle analisi.
+
+\section{Esportazione e portabilità delle visualizzazioni}
+
+Un altro aspetto critico riguarda la possibilità di esportare le visualizzazioni in formati facilmente condivisibili e archiviabili. Mentre molte soluzioni permettono l'esportazione in formato immagine o PDF, poche offrono la generazione di file HTML standalone che includano dati, configurazioni e logica interattiva.
+
+La soluzione proposta in questa tesi, come implementato nel componente \texttt{Download} e nel pacchetto \texttt{widv-plot} del branch \texttt{pkg}, consente di esportare la visualizzazione corrente in un file HTML autosufficiente. Questo approccio garantisce la portabilità e la conservazione delle analisi, anche in assenza di connessione al server originale.
+
+\section{Performance e scalabilità}
+
+Le performance sono un fattore chiave nella scelta delle tecnologie per la visualizzazione di grandi dataset. Soluzioni come Grafana e Kibana sono ottimizzate per la scalabilità lato server, ma possono mostrare limiti in termini di reattività lato client, soprattutto su dispositivi mobili o con connessioni lente.
+
+L'architettura adottata nel branch \texttt{pkg} sfrutta la reattività di SolidJS e l'ottimizzazione del rendering tramite D3.js per garantire un'esperienza utente fluida anche con dataset di grandi dimensioni. L'adozione di tecniche come il rendering selettivo, il lazy loading dei dati e la gestione efficiente dello stato contribuisce a minimizzare i tempi di risposta e a ridurre il carico computazionale sul client.
+
+\section{Confronto con la soluzione proposta}
+
+Rispetto alle piattaforme analizzate, la soluzione proposta nel branch \texttt{pkg} si distingue per:
+
+\begin{itemize}
+    \item \textbf{Flessibilità}: la modularità del pacchetto \texttt{widv-plot} e la possibilità di personalizzare facilmente i componenti.
+    \item \textbf{Reattività}: aggiornamenti immediati dell'interfaccia grazie a SolidJS.
+    \item \textbf{Condivisione avanzata}: stato serializzato nell'URL e esportazione in HTML standalone.
+    \item \textbf{Integrazione con stack moderni}: utilizzo di Astro, TypeScript, TailwindCSS e Docker per il deployment.
+\end{itemize}
+
+\section{Evoluzione futura e tendenze}
+
+Il settore della visualizzazione dati è in continua evoluzione. Si assiste a una crescente integrazione tra strumenti di analisi, machine learning e visualizzazione interattiva. Framework come Observable, che permettono la creazione di notebook interattivi, e l'adozione di WebAssembly per il calcolo ad alte prestazioni, stanno aprendo nuove possibilità.
+
+Nel contesto del progetto, la struttura modulare e l'adozione di tecnologie moderne pongono solide basi per l'integrazione futura di algoritmi di analisi automatica, visualizzazione di dati geospaziali e supporto a nuovi formati di dati.
+
+\section{Conclusioni}
+
+L'analisi dello stato dell'arte evidenzia come la soluzione sviluppata nel branch \texttt{pkg} rappresenti un avanzamento significativo rispetto agli strumenti tradizionali, offrendo una combinazione unica di flessibilità, performance e facilità di condivisione. L'integrazione di tecnologie all'avanguardia e l'attenzione alla modularità e alla scalabilità pongono le basi per applicazioni data-centriche innovative e sostenibili.
+
+
+
 \subsection{Altre soluzioni open source e librerie JavaScript}
 
 Esistono numerose librerie JavaScript per la visualizzazione di serie temporali, tra cui D3.js, Chart.js, e ECharts. Queste librerie forniscono strumenti potenti per la creazione di grafici, ma richiedono spesso sviluppi ad hoc per integrare funzionalità avanzate come la gestione dello stato, il confronto tra scenari, o l’esportazione delle visualizzazioni.

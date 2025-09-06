@@ -47,6 +47,7 @@
 \chead{}
 \rhead{\bfseries\thepage}
 \fancypagestyle{plain}{\fancyhead{}\renewcommand{\headrulewidth}{0pt}}
+
 \begin{document}
 \setlength{\baselineskip}{2.0\baselineskip}
 \setlength{\headheight}{15pt}
@@ -64,10 +65,13 @@
 \mainmatter
 \input{sections.tex}
 \backmatter
-\clearpage{\pagestyle{empty}\cleardoublepage}
+
+\cleardoublepage
+\addcontentsline{toc}{chapter}{Bibliografia}
 \bibliographystyle{plain}
-\bibliography{biblio.bib}
+\bibliography{biblio}
+
 \StrLen{\ringraziamenti}[\ringraziamentiLen]%
 \ifthenelse{\ringraziamentiLen > 0}{\input{sections/ringraziamenti}}{}
-\cite{esempio_citazione}
+
 \end{document}

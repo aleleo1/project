@@ -1,33 +1,126 @@
 \clearpage{\pagestyle{empty}\cleardoublepage}
 \chapter{Soluzione Proposta}
 \label{chap:soluzione_proposta}
-
+\cite{astro}
+\cite{solidjs}
+\cite{d3js}
+\cite{tailwindcss}
+\cite{nodejs}
+\cite{mysql}
+\cite{docker}
+\cite{grafana}
+\cite{kibana}
 \section{Architettura}
 
-L'applicazione è composta da:
-\begin{itemize}
-    \item \textbf{Frontend}: Astro + SolidJS, con componenti come \texttt{Container}, \texttt{Download}, e \texttt{Storico}.
-    \item \textbf{Visualizzazione}: \texttt{widv-plot}, che implementa zoom, pan, selezione intervalli e supporta diversi tipi di grafici.
-    \item \textbf{Backend}: Node.js con MySQL, gestito tramite \texttt{mysql-adapter}.
-\end{itemize}
+L'applicazione è composta da diversi moduli che collaborano per offrire un'esperienza di visualizzazione dati avanzata e reattiva. Il frontend è sviluppato con Astro e SolidJS, sfruttando la modularità dei componenti e la reattività dello stato. I componenti principali includono \texttt{Container}, che gestisce il layout generale, \texttt{Download}, che si occupa dell'esportazione delle visualizzazioni, e \texttt{Storico}, che permette la navigazione tra diversi stati dei dati. 
+
+La visualizzazione dei dati è affidata al pacchetto \texttt{widv-plot}, sviluppato come libreria riusabile in SolidJS. Questo componente implementa funzionalità avanzate come zoom, pan, selezione di intervalli temporali e supporto a diversi tipi di grafici (discreti e continui). Il backend, realizzato in Node.js, si interfaccia con un database MySQL tramite l'adapter \texttt{mysql-adapter}, gestendo la persistenza e il recupero efficiente delle serie temporali.
+
+\subsection{Flusso dei dati}
+
+Il flusso dei dati parte dalla richiesta dell'utente, che può selezionare intervalli temporali, filtri o scenari di interesse. Queste informazioni vengono codificate nello stato dell'applicazione e trasmesse al backend tramite chiamate API. Il backend esegue query ottimizzate sul database MySQL e restituisce i dati richiesti in formato JSON. Il frontend riceve i dati e li passa al componente \texttt{widv-plot}, che aggiorna la visualizzazione in tempo reale.
+
+\subsection{Componenti principali}
+
+\paragraph{Container} Gestisce la struttura della pagina, l'integrazione tra i vari componenti e la responsività dell'interfaccia.
+
+\paragraph{Download} Permette all'utente di esportare la visualizzazione corrente in formato HTML standalone, includendo tutti i dati e le configurazioni selezionate.
+
+\paragraph{Storico} Consente di navigare tra diversi stati salvati dell'applicazione, facilitando il confronto tra scenari e la riproducibilità delle analisi.
+
+\paragraph{widv-plot} È il cuore della visualizzazione: implementa la logica di rendering dei grafici, la gestione degli eventi di interazione (zoom, pan, selezione) e l'adattamento dinamico alle dimensioni del contenitore.
 
 \section{Gestione dello stato}
 
-Lo stato dell'applicazione (filtri, intervalli, visualizzazione) è codificato nell'URL tramite funzioni come \texttt{createQuerySignal} e \texttt{updateUrl}, permettendo la condivisione e il ripristino delle analisi.
+La gestione dello stato è uno degli aspetti più innovativi della soluzione proposta. Tutte le configurazioni dell'interfaccia (filtri, intervalli temporali, tipo di grafico, ecc.) vengono codificate nell'URL tramite funzioni dedicate come \texttt{createQuerySignal} e \texttt{updateUrl}. Questo approccio consente di condividere facilmente lo stato dell'applicazione semplicemente copiando l'URL, garantendo la riproducibilità esatta della visualizzazione.
 
-\section{Esportazione}
+Inoltre, la sincronizzazione dello stato tra i vari componenti è gestita tramite segnali reattivi di SolidJS, che assicurano aggiornamenti immediati dell'interfaccia senza ricaricare la pagina. Questo modello favorisce la scalabilità e la manutenibilità del codice, permettendo di aggiungere nuove funzionalità senza introdurre complessità eccessiva.
 
-La funzione di esportazione genera file HTML standalone, facilitando la condivisione dei risultati.
+\subsection{Esempio di flusso di stato}
 
-\section{Esempi di codice}
+Quando l'utente modifica un filtro o seleziona un nuovo intervallo temporale, il segnale associato aggiorna l'URL e notifica i componenti interessati. Il backend riceve la nuova richiesta, esegue la query e restituisce i dati aggiornati, che vengono immediatamente visualizzati.
 
-\begin{lstlisting}[language=TypeScript]
-export const get_DEFAULT_DATES = () => {
-  const ACTUAL_DATE = new Date()
-  const ACTUAL_DATE_MINUS_6 = new Date()
-  ACTUAL_DATE_MINUS_6.setMonth(ACTUAL_DATE_MINUS_6.getMonth() - 6)
-  const ACTUAL_DATE_MINUS_YEAR = new Date()
-  ACTUAL_DATE_MINUS_YEAR.setFullYear(ACTUAL_DATE_MINUS_YEAR.getFullYear() - 1)
-  return [ACTUAL_DATE_MINUS_6, ACTUAL_DATE_MINUS_YEAR]
-}
-\end{lstlisting}
+\section{Esportazione e condivisione}
+
+Una delle funzionalità chiave è la possibilità di esportare la visualizzazione corrente in un file HTML standalone. Questo file include tutti i dati, le configurazioni e lo stato dell'applicazione, permettendo di condividere i risultati con colleghi o di archiviarli per analisi future. L'esportazione avviene lato client, senza necessità di ulteriori elaborazioni server, garantendo rapidità e sicurezza.
+
+\section{Ottimizzazione delle performance}
+
+Per gestire dataset di grandi dimensioni e garantire un'esperienza fluida anche su dispositivi mobili, sono state adottate diverse strategie di ottimizzazione:
+
+\begin{itemize}
+    \item \textbf{Rendering selettivo}: solo i dati visibili vengono renderizzati, riducendo il carico sul browser.
+    \item \textbf{Gestione efficiente dello stato}: l'uso di segnali reattivi minimizza i ricalcoli e gli aggiornamenti inutili.
+    \item \textbf{Lazy loading}: i dati vengono caricati in modo incrementale, evitando blocchi dell'interfaccia.
+    \item \textbf{Ottimizzazione delle query}: il backend esegue solo le query strettamente necessarie, sfruttando indici e cache.
+\end{itemize}
+
+\section{Personalizzazione e modularità}
+
+L'architettura modulare consente di personalizzare facilmente l'applicazione per diversi casi d'uso. Il componente \texttt{widv-plot} espone una serie di callback e opzioni configurabili, permettendo di adattare la visualizzazione alle esigenze specifiche dell'utente o del dominio applicativo. Nuovi tipi di grafici o funzionalità possono essere aggiunti senza modificare il core dell'applicazione.
+
+\section{Sicurezza e scalabilità}
+
+La sicurezza è garantita tramite l'autenticazione delle richieste e la validazione dei dati sia lato client che server. L'architettura è pensata per scalare orizzontalmente: il backend può essere replicato su più istanze e il database ottimizzato per gestire carichi elevati. L'uso di container (Docker) e la configurazione di Nginx facilitano il deployment in ambienti di produzione.
+
+\section{Esperienza utente e accessibilità}
+
+Particolare attenzione è stata posta all'esperienza utente: l'interfaccia è responsiva, accessibile tramite tastiera e compatibile con screen reader. I feedback visivi e i messaggi di errore sono chiari e contestuali, guidando l'utente nelle operazioni più complesse.
+
+\section{Estendibilità futura}
+
+La soluzione proposta è pensata per essere estesa in futuro con nuove funzionalità, come l'integrazione di algoritmi di analisi automatica dei dati, la visualizzazione di dati geospaziali o l'interfacciamento con altre fonti dati. La documentazione dettagliata e la struttura modulare facilitano il lavoro di altri sviluppatori che vorranno contribuire al progetto.
+\section{Dettaglio dei flussi applicativi}
+
+L’architettura della soluzione proposta si basa su una chiara separazione tra frontend, backend e livello dati, con una comunicazione efficiente tra i vari moduli. Nel branch \texttt{pkg}, il flusso tipico di una richiesta utente inizia con l’interazione con l’interfaccia grafica, dove l’utente può selezionare intervalli temporali, filtri o tipologie di visualizzazione. Queste scelte vengono immediatamente riflesse nello stato dell’applicazione grazie ai segnali reattivi di SolidJS.
+
+Il frontend, tramite chiamate API asincrone, invia le richieste al backend Node.js, che si occupa di interrogare il database MySQL attraverso l’adapter personalizzato. I dati restituiti vengono processati e visualizzati in tempo reale dal componente \texttt{widv-plot}, che aggiorna dinamicamente il grafico senza necessità di ricaricare la pagina.
+
+\subsection{Gestione avanzata degli eventi utente}
+
+Un aspetto fondamentale della soluzione è la gestione avanzata degli eventi utente. Il componente \texttt{Plot.tsx} implementa logiche sofisticate per la selezione di intervalli tramite drag-and-drop, zoom con la rotella del mouse, pan tramite trascinamento e selezione manuale delle date. Ogni evento genera un aggiornamento dello stato locale, che viene propagato ai componenti interessati tramite segnali SolidJS, garantendo una reattività immediata.
+
+\subsection{Sincronizzazione dello stato tra componenti}
+
+La sincronizzazione dello stato tra i vari componenti è ottenuta tramite segnali condivisi e funzioni di utilità come \texttt{createQuerySignal}. Questo approccio permette di mantenere la coerenza dell’interfaccia anche in scenari complessi, come la navigazione tra stati storici o il confronto tra diversi scenari di dati. L’encoding dello stato nell’URL consente inoltre di ripristinare esattamente la stessa visualizzazione in sessioni successive o su dispositivi diversi.
+
+\section{Personalizzazione e configurabilità}
+
+La soluzione proposta è altamente personalizzabile. Il componente \texttt{widv-plot} espone numerose opzioni di configurazione, tra cui la scelta del tipo di grafico (discreto o continuo), la personalizzazione dei colori, la definizione di callback per eventi specifici (hover, selezione intervallo, aggiornamento dati) e la possibilità di integrare nuovi tipi di visualizzazione con minime modifiche al codice esistente.
+
+Nel branch \texttt{pkg}, la modularità del codice è evidente nella struttura delle cartelle e nella separazione tra logica di visualizzazione, gestione dello stato e interfaccia utente. Questo facilita l’estensione futura del sistema, ad esempio per aggiungere nuove funzionalità di analisi automatica o per integrare dati provenienti da fonti eterogenee.
+
+\section{Ottimizzazione delle performance e gestione di grandi dataset}
+
+Per garantire performance elevate anche con dataset di grandi dimensioni, sono state adottate diverse strategie di ottimizzazione:
+
+\begin{itemize}
+    \item \textbf{Rendering selettivo}: solo i dati effettivamente visibili vengono renderizzati, riducendo il carico computazionale sul browser.
+    \item \textbf{Lazy loading}: i dati vengono caricati in modo incrementale, evitando blocchi dell’interfaccia e migliorando la scalabilità.
+    \item \textbf{Debouncing degli eventi}: le operazioni di aggiornamento vengono raggruppate per evitare chiamate eccessive al backend o ricalcoli inutili.
+    \item \textbf{Caching locale}: i dati già caricati vengono memorizzati localmente per velocizzare le operazioni di navigazione tra intervalli temporali.
+\end{itemize}
+
+Queste tecniche, implementate nel codice del branch \texttt{pkg}, permettono di mantenere un’esperienza utente fluida anche su dispositivi mobili o in presenza di connessioni lente.
+
+\section{Sicurezza, autenticazione e gestione degli accessi}
+
+La sicurezza è un aspetto centrale della soluzione proposta. Il backend implementa meccanismi di autenticazione e autorizzazione per garantire che solo utenti abilitati possano accedere ai dati sensibili o alle funzionalità avanzate. Le richieste API sono validate sia lato client che server, e tutte le operazioni di scrittura sul database sono protette da controlli di integrità e transazionalità.
+
+Nel branch \texttt{pkg}, la configurazione del backend e l’uso di variabili d’ambiente per la gestione delle credenziali contribuiscono a ridurre i rischi di esposizione accidentale di dati sensibili.
+
+\section{Esperienza utente e accessibilità}
+
+L’interfaccia utente è progettata per essere intuitiva e accessibile. L’uso di TailwindCSS consente di mantenere uno stile coerente e responsivo su tutti i dispositivi. Sono stati implementati accorgimenti per garantire la compatibilità con screen reader, la navigazione tramite tastiera e la presenza di feedback visivi chiari in caso di errori o operazioni non consentite.
+
+\section{Deployment, containerizzazione e scalabilità}
+
+Per facilitare il deployment in ambienti di produzione, la soluzione include un \texttt{Dockerfile} e una configurazione Nginx dedicata. Questo consente di eseguire l’applicazione in container isolati, garantendo portabilità, scalabilità e facilità di aggiornamento. La struttura modulare del backend permette di scalare orizzontalmente il servizio, replicando le istanze Node.js e bilanciando il carico tramite Nginx.
+
+\section{Estendibilità e prospettive future}
+
+La soluzione proposta è pensata per essere facilmente estendibile. La documentazione dettagliata, la presenza di test statici e la chiarezza della struttura del codice nel branch \texttt{pkg} facilitano il lavoro di altri sviluppatori che vorranno contribuire al progetto. Tra le possibili evoluzioni future si annoverano l’integrazione di algoritmi di machine learning per l’analisi automatica dei dati, la visualizzazione di dati geospaziali e l’interfacciamento con sistemi di allerta in tempo reale.
+
+\section{Conclusioni}
+
+In conclusione, la soluzione proposta rappresenta un avanzamento significativo rispetto agli strumenti tradizionali di visualizzazione dati, offrendo una combinazione unica di flessibilità, performance, sicurezza e facilità di condivisione. L’integrazione di tecnologie moderne e l’attenzione alla modularità pongono solide basi per lo sviluppo di applicazioni data-centriche innovative e sostenibili.
